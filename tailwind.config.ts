@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// InLustro custom colors
+				"inlustro-blue": {
+					light: "#D3E4FD",
+					DEFAULT: "#33C3F0",
+					dark: "#1EAEDB"
+				},
+				"inlustro-yellow": {
+					light: "#FEF7CD",
+					DEFAULT: "#F9E559",
+					dark: "#F7DD1E"
 				}
 			},
 			borderRadius: {
