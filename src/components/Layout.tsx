@@ -10,7 +10,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <SidebarProvider collapsedWidth={56}>
+    <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen w-full bg-gray-50">
         <Header />
         <div className="flex w-full">

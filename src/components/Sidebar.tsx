@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   BarChart3,
@@ -31,7 +31,8 @@ const items = [
 ];
 
 const AppSidebar = () => {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -46,10 +47,10 @@ const AppSidebar = () => {
   return (
     <SidebarComponent
       className={collapsed ? "w-14 border-r" : "w-64 border-r"}
-      collapsible
+      collapsible="icon"
     >
       <SidebarContent>
-        <SidebarGroup open={true}>
+        <SidebarGroup>
           <SidebarGroupLabel className={collapsed ? "hidden" : "block"}>
             Navigation
           </SidebarGroupLabel>
