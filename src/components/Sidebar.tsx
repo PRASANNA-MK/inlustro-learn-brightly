@@ -1,88 +1,80 @@
-
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import {
-  BarChart3,
-  Book,
-  FileQuestion,
-  Home,
-  Award,
-  User,
-  MessageSquare,
-  Mic,
-} from 'lucide-react';
-import {
-  Sidebar as SidebarComponent,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  useSidebar,
-} from "@/components/ui/sidebar";
-
-const items = [
-  { title: 'Dashboard', url: '/', icon: Home },
-  { title: 'Lessons', url: '/lessons', icon: Book },
-  { title: 'Quizzes', url: '/quizzes', icon: FileQuestion },
-  { title: 'AI Voice Tutor', url: '/ai-tutor', icon: Mic },
-  { title: 'Chatbot', url: '/chatbot', icon: MessageSquare },
-  { title: 'Gamification', url: '/gamification', icon: Award },
-  { title: 'Profile', url: '/profile', icon: User },
-];
+import { Link, NavLink } from 'react-router-dom';
+import { useSidebar } from '@/components/ui/sidebar';
+import { Home, Book, GraduationCap, User, MessageSquare } from 'lucide-react';
 
 const AppSidebar = () => {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
-  const location = useLocation();
-  const currentPath = location.pathname;
+  const { isOpen, setIsOpen } = useSidebar();
 
-  const isActive = (path: string) => {
-    if (path === '/' && currentPath === '/') return true;
-    if (path !== '/' && currentPath.startsWith(path)) return true;
-    return false;
-  };
-  
-  const isExpanded = items.some(i => isActive(i.url));
+  const navItems = [
+    {
+      path: '/',
+      label: 'Dashboard',
+      icon: <Home className="h-4 w-4" />,
+    },
+    {
+      path: '/lessons',
+      label: 'Lessons',
+      icon: <Book className="h-4 w-4" />,
+    },
+    {
+      path: '/quizzes',
+      label: 'Quizzes',
+      icon: <GraduationCap className="h-4 w-4" />,
+    },
+    {
+      path: '/ai-tutor',
+      label: 'AI Voice Tutor',
+      icon: <GraduationCap className="h-4 w-4" />,
+    },
+    {
+      path: '/chatbot',
+      label: 'Chatbot',
+      icon: <MessageSquare className="h-4 w-4" />,
+    },
+    {
+      path: '/profile',
+      label: 'Profile',
+      icon: <User className="h-4 w-4" />,
+    },
+  ];
 
   return (
-    <SidebarComponent
-      className={collapsed ? "w-14 border-r" : "w-64 border-r"}
-      collapsible="icon"
+    <aside
+      className={`fixed left-0 top-0 z-50 flex h-full flex-col justify-between overflow-y-auto border-r bg-sidebar shadow-md transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      } w-64`}
     >
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "hidden" : "block"}>
-            Navigation
-          </SidebarGroupLabel>
-
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === '/'} 
-                      className={({ isActive }) => 
-                        isActive 
-                          ? "flex items-center gap-2 rounded-md bg-inlustro-blue/10 p-2 text-inlustro-blue font-medium"
-                          : "flex items-center gap-2 rounded-md p-2 hover:bg-accent"
-                      }
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </SidebarComponent>
+      <div className="px-6 py-4">
+        <Link to="/" className="mb-6 inline-block">
+          <span className="font-bold text-xl">InLustro</span>
+        </Link>
+        <nav className="space-y-1">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `group flex items-center space-x-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+                  isActive
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground'
+                }`
+              }
+              onClick={() => setIsOpen(false)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+      <div className="border-t px-6 py-4">
+        <p className="text-xs text-sidebar-foreground">
+          © {new Date().getFullYear()} InLustro
+        </p>
+      </div>
+    </aside>
   );
 };
 

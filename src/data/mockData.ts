@@ -1,3 +1,9 @@
+import { User as UserIcon, Book, Code, GraduationCap, ListChecks, Presentation, MessageSquare } from 'lucide-react';
+
+export interface Subject {
+  id: string;
+  name: string;
+}
 
 export interface User {
   id: string;
@@ -7,401 +13,308 @@ export interface User {
   class: string;
   level: number;
   xp: number;
+  lastLogin: string;
   language: string;
   theme: 'light' | 'dark';
-  lastLogin: string;
 }
 
-export interface Subject {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  progress: number;
-  lessonsCompleted: number;
-  totalLessons: number;
-}
+export const navigation = [
+  {
+    title: 'Dashboard',
+    href: '/',
+    icon: UserIcon,
+  },
+  {
+    title: 'Lessons',
+    href: '/lessons',
+    icon: Book,
+  },
+  {
+    title: 'Quizzes',
+    href: '/quizzes',
+    icon: ListChecks,
+  },
+  {
+    title: 'AI Voice Tutor',
+    href: '/ai-tutor',
+    icon: Presentation,
+  },
+  {
+    title: 'Chatbot',
+    href: MessageSquare,
+  },
+  {
+    title: 'Gamification',
+    href: '/gamification',
+    icon: Code,
+  },
+  {
+    title: 'Profile',
+    href: '/profile',
+    icon: GraduationCap,
+  },
+];
 
+export const subjects: Subject[] = [
+  {
+    id: '1',
+    name: 'Math'
+  },
+  {
+    id: '2',
+    name: 'Science'
+  },
+  {
+    id: '3',
+    name: 'English'
+  },
+  {
+    id: '4',
+    name: 'History'
+  }
+];
+
+export const currentUser: User = {
+  id: 'user-1',
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  avatar: '/placeholder.svg',
+  class: '10th Grade',
+  level: 5,
+  xp: 450,
+  lastLogin: new Date(2023, 10, 20).toISOString(),
+  language: 'English',
+  theme: 'light'
+};
+
+// Extend the Lesson interface to include hasVoiceTutor property
 export interface Lesson {
   id: string;
   title: string;
   subjectId: string;
-  status: 'Not Started' | 'In Progress' | 'Completed';
   duration: string;
+  description?: string;
   content: string;
-  imageUrl?: string;
+  status: 'Not Started' | 'In Progress' | 'Completed';
+  hasVoiceTutor?: boolean;
+}
+
+// Mock data for lessons
+export const lessons: Lesson[] = [
+  {
+    id: '1',
+    title: 'Introduction to Algebra',
+    subjectId: '1', // Math
+    duration: '20 minutes',
+    description: 'Learn the basics of algebraic expressions and equations.',
+    content: `
+      <h2>Introduction to Algebra</h2>
+      <p>Algebra is a branch of mathematics that uses symbols and letters to represent numbers, quantities, and operations in formulas and equations.</p>
+      <h3>Key Concepts</h3>
+      <ul>
+        <li>Variables - Letters that represent unknown values</li>
+        <li>Constants - Fixed values that don't change</li>
+        <li>Expressions - Combinations of variables, constants, and operations</li>
+        <li>Equations - Statements that show two expressions are equal</li>
+      </ul>
+      <p>In this lesson, we'll explore how to manipulate algebraic expressions and solve simple equations.</p>
+    `,
+    status: 'In Progress',
+    hasVoiceTutor: true
+  },
+  {
+    id: '2',
+    title: 'Photosynthesis Explained',
+    subjectId: '2', // Science
+    duration: '25 minutes',
+    description: 'Discover how plants convert sunlight into energy through photosynthesis.',
+    content: `
+      <h2>Photosynthesis</h2>
+      <p>Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy in the form of glucose.</p>
+      <h3>The Process</h3>
+      <p>The basic equation for photosynthesis is:</p>
+      <p>6CO<sub>2</sub> + 6H<sub>2</sub>O + Light Energy → C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>2</sub></p>
+      <h3>Components Involved</h3>
+      <ul>
+        <li>Chlorophyll - The green pigment that captures light energy</li>
+        <li>Chloroplasts - The organelles where photosynthesis occurs</li>
+        <li>Stomata - Small pores in leaves that allow gas exchange</li>
+      </ul>
+      <p>Through this process, plants produce the oxygen we breathe and the glucose they need for growth.</p>
+    `,
+    status: 'Not Started',
+    hasVoiceTutor: true
+  },
+  {
+    id: '3',
+    title: 'Shakespeare\'s Major Works',
+    subjectId: '3', // English
+    duration: '30 minutes',
+    description: 'Explore the themes and language in Shakespeare\'s most famous plays and sonnets.',
+    content: `
+      <h2>Shakespeare's Major Works</h2>
+      <p>William Shakespeare (1564-1616) was an English playwright, poet, and actor. He is widely regarded as the greatest writer in the English language.</p>
+      <h3>Major Plays</h3>
+      <ul>
+        <li>Tragedies: Hamlet, Macbeth, Romeo and Juliet, King Lear, Othello</li>
+        <li>Comedies: A Midsummer Night's Dream, Much Ado About Nothing, Twelfth Night</li>
+        <li>Histories: Henry V, Richard III, Julius Caesar</li>
+      </ul>
+      <h3>Sonnets</h3>
+      <p>Shakespeare wrote 154 sonnets dealing with themes of love, beauty, mortality, and the passage of time.</p>
+      <p>His works continue to be studied and performed worldwide, influencing literature and culture for over 400 years.</p>
+    `,
+    status: 'Completed',
+    hasVoiceTutor: true
+  }
+];
+
+// Update the quiz interface to include more comprehensive fields for the enhanced quiz feature
+export interface Question {
+  id: string;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
 }
 
 export interface Quiz {
   id: string;
   title: string;
   subjectId: string;
-  questions: Question[];
-  completed: boolean;
-  score?: number;
+  description?: string;
   totalQuestions: number;
+  timeLimit?: number; // time limit in minutes
+  completed?: boolean;
+  score?: number;
+  questions: Question[];
 }
 
-export interface Question {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-}
-
-export interface Badge {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  earned: boolean;
-  earnedDate?: string;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  avatar: string;
-  xp: number;
-  level: number;
-  class: string;
-}
-
-export interface WeeklyActivity {
-  day: string;
-  minutes: number;
-}
-
-export const currentUser: User = {
-  id: 'u1',
-  name: 'Alex Johnson',
-  email: 'alex.j@school.edu',
-  avatar: '/placeholder.svg',
-  class: '10th Grade',
-  level: 15,
-  xp: 3450,
-  language: 'English',
-  theme: 'light',
-  lastLogin: '2023-05-12T14:32:00Z',
-};
-
-export const subjects: Subject[] = [
-  {
-    id: 's1',
-    name: 'Mathematics',
-    icon: 'calculator',
-    color: '#33C3F0',
-    progress: 68,
-    lessonsCompleted: 12,
-    totalLessons: 18,
-  },
-  {
-    id: 's2',
-    name: 'Science',
-    icon: 'flask',
-    color: '#F9E559',
-    progress: 45,
-    lessonsCompleted: 9,
-    totalLessons: 20,
-  },
-  {
-    id: 's3',
-    name: 'English',
-    icon: 'book',
-    color: '#FF7E67',
-    progress: 82,
-    lessonsCompleted: 14,
-    totalLessons: 17,
-  },
-  {
-    id: 's4',
-    name: 'History',
-    icon: 'landmark',
-    color: '#89B0AE',
-    progress: 30,
-    lessonsCompleted: 6,
-    totalLessons: 20,
-  },
-];
-
-export const lessons: Lesson[] = [
-  {
-    id: 'l1',
-    title: 'Algebra Fundamentals',
-    subjectId: 's1',
-    status: 'Completed',
-    duration: '45 min',
-    content: `
-      <h2>Algebra Fundamentals</h2>
-      <p>In this lesson, we will cover the basics of algebraic expressions and equations.</p>
-      <h3>Topics covered:</h3>
-      <ul>
-        <li>Variables and constants</li>
-        <li>Expressions vs. equations</li>
-        <li>Solving simple equations</li>
-        <li>Real-world applications</li>
-      </ul>
-      <p>Algebra is all about finding the unknown. When we have an equation like x + 5 = 12, we can solve for x by subtracting 5 from both sides: x = 7.</p>
-      <h3>Key Points to Remember:</h3>
-      <ol>
-        <li>Always perform the same operation on both sides of an equation</li>
-        <li>Isolate the variable to find its value</li>
-        <li>Check your answer by substituting it back into the original equation</li>
-      </ol>
-    `,
-  },
-  {
-    id: 'l2',
-    title: 'Fractions and Decimals',
-    subjectId: 's1',
-    status: 'In Progress',
-    duration: '40 min',
-    content: `
-      <h2>Fractions and Decimals</h2>
-      <p>This lesson covers the relationship between fractions and decimals, and how to convert between them.</p>
-      <h3>Converting Fractions to Decimals:</h3>
-      <p>To convert a fraction to a decimal, divide the numerator by the denominator. For example, 3/4 = 0.75</p>
-      <h3>Converting Decimals to Fractions:</h3>
-      <p>To convert a decimal to a fraction:</p>
-      <ol>
-        <li>Write the decimal as a fraction with 1 in the denominator</li>
-        <li>Multiply both the numerator and denominator by the power of 10 needed to remove the decimal point</li>
-        <li>Simplify the fraction if possible</li>
-      </ol>
-      <p>For example: 0.25 = 25/100 = 1/4</p>
-    `,
-  },
-  {
-    id: 'l3',
-    title: 'Cells and Organelles',
-    subjectId: 's2',
-    status: 'Completed',
-    duration: '50 min',
-    content: `
-      <h2>Cells and Organelles</h2>
-      <p>This lesson explores the structure of cells and the functions of various organelles.</p>
-      <h3>Cell Structure:</h3>
-      <p>Cells are the basic units of life. They contain various organelles that perform specific functions to keep the cell alive.</p>
-      <h3>Key Organelles:</h3>
-      <ul>
-        <li><strong>Nucleus:</strong> Controls the cell's activities and contains genetic material</li>
-        <li><strong>Mitochondria:</strong> Produces energy through cellular respiration</li>
-        <li><strong>Ribosomes:</strong> Synthesizes proteins</li>
-        <li><strong>Endoplasmic Reticulum:</strong> Transports materials within the cell</li>
-      </ul>
-      <p>Plant cells also have chloroplasts for photosynthesis and a cell wall for structure.</p>
-    `,
-  },
-  {
-    id: 'l4',
-    title: 'Shakespeare Introduction',
-    subjectId: 's3',
-    status: 'Not Started',
-    duration: '55 min',
-    content: `
-      <h2>Introduction to Shakespeare</h2>
-      <p>William Shakespeare is one of the most influential writers in the English language. This lesson introduces his life and major works.</p>
-      <h3>Shakespeare's Life:</h3>
-      <p>Born in 1564 in Stratford-upon-Avon, England, Shakespeare became a prominent playwright and poet. He wrote approximately 37 plays and 154 sonnets.</p>
-      <h3>Major Works:</h3>
-      <ul>
-        <li>Romeo and Juliet</li>
-        <li>Hamlet</li>
-        <li>Macbeth</li>
-        <li>A Midsummer Night's Dream</li>
-      </ul>
-      <p>His works are known for their complex characters, insightful commentary on human nature, and beautiful language.</p>
-    `,
-  },
-];
-
+// Enhance quiz data
 export const quizzes: Quiz[] = [
   {
-    id: 'q1',
-    title: 'Algebra Basics Quiz',
-    subjectId: 's1',
-    completed: true,
-    score: 80,
+    id: '1',
+    title: 'Algebra Fundamentals',
+    subjectId: '1',
+    description: 'Test your knowledge of basic algebraic concepts',
     totalQuestions: 5,
-    questions: [
-      {
-        id: 'qst1',
-        text: 'Solve for x: 3x + 7 = 22',
-        options: ['x = 5', 'x = 7', 'x = 15', 'x = 3'],
-        correctAnswer: 0,
-      },
-      {
-        id: 'qst2',
-        text: 'What is the value of y in the equation 2y - 3 = 9?',
-        options: ['y = 3', 'y = 6', 'y = 12', 'y = 4.5'],
-        correctAnswer: 1,
-      },
-      {
-        id: 'qst3',
-        text: 'Simplify the expression: 4(2x + 3) - 5x',
-        options: ['3x + 12', '8x + 12', '3x + 7', '7x + 12'],
-        correctAnswer: 0,
-      },
-      {
-        id: 'qst4',
-        text: 'If f(x) = 2x² + 3x - 4, what is f(2)?',
-        options: ['6', '8', '10', '12'],
-        correctAnswer: 2,
-      },
-      {
-        id: 'qst5',
-        text: 'Solve the inequality: -3x < 15',
-        options: ['x < -5', 'x > -5', 'x < 5', 'x > 5'],
-        correctAnswer: 1,
-      },
-    ],
-  },
-  {
-    id: 'q2',
-    title: 'Cell Biology Quiz',
-    subjectId: 's2',
-    completed: true,
-    score: 60,
-    totalQuestions: 5,
-    questions: [
-      {
-        id: 'qst6',
-        text: 'Which organelle is known as the "powerhouse of the cell"?',
-        options: ['Nucleus', 'Mitochondria', 'Ribosome', 'Golgi Apparatus'],
-        correctAnswer: 1,
-      },
-      {
-        id: 'qst7',
-        text: 'Which of the following is NOT found in plant cells?',
-        options: ['Cell Wall', 'Chloroplast', 'Centrioles', 'Vacuole'],
-        correctAnswer: 2,
-      },
-      {
-        id: 'qst8',
-        text: 'What is the primary function of ribosomes?',
-        options: ['Energy production', 'Protein synthesis', 'Lipid storage', 'Waste disposal'],
-        correctAnswer: 1,
-      },
-      {
-        id: 'qst9',
-        text: 'The cell membrane is composed primarily of:',
-        options: ['Proteins', 'Carbohydrates', 'Phospholipids', 'Nucleic acids'],
-        correctAnswer: 2,
-      },
-      {
-        id: 'qst10',
-        text: 'Which type of cell does NOT contain DNA?',
-        options: ['Animal cell', 'Plant cell', 'Mature red blood cell', 'Bacterial cell'],
-        correctAnswer: 2,
-      },
-    ],
-  },
-  {
-    id: 'q3',
-    title: 'English Grammar Challenge',
-    subjectId: 's3',
+    timeLimit: 10,
     completed: false,
-    totalQuestions: 5,
     questions: [
       {
-        id: 'qst11',
-        text: 'Which of these is a proper noun?',
-        options: ['teacher', 'city', 'London', 'house'],
-        correctAnswer: 2,
+        id: 'q1-1',
+        text: 'If x + 5 = 9, what is the value of x?',
+        options: ['2', '4', '5', '14'],
+        correctAnswer: 1,
+        explanation: 'To solve for x, subtract 5 from both sides: x + 5 - 5 = 9 - 5, which gives x = 4.'
       },
       {
-        id: 'qst12',
-        text: 'Which sentence uses correct punctuation?',
-        options: [
-          'The movie, which was three hours long ended at midnight.',
-          'The movie which was three hours long, ended at midnight.',
-          'The movie which was three hours long ended at midnight.',
-          'The movie, which was three hours long, ended at midnight.',
-        ],
+        id: 'q1-2',
+        text: 'Simplify the expression: 3(x + 2) - 4x',
+        options: ['3x + 6 - 4x', '3x - 4x + 6', 'x + 6', '-x + 6'],
         correctAnswer: 3,
+        explanation: 'First distribute: 3(x + 2) - 4x = 3x + 6 - 4x. Then combine like terms: 3x - 4x + 6 = -x + 6'
       },
       {
-        id: 'qst13',
-        text: 'Identify the verb in the sentence: "The dog barked loudly at the mailman."',
-        options: ['dog', 'barked', 'loudly', 'mailman'],
-        correctAnswer: 1,
+        id: 'q1-3',
+        text: 'Which of the following is equivalent to 2(x - 3) + 4?',
+        options: ['2x - 6 + 4', '2x - 2', '2x - 2 + 4', '2x - 6'],
+        correctAnswer: 0,
+        explanation: 'Distribute 2: 2(x - 3) + 4 = 2x - 6 + 4 = 2x - 2'
       },
       {
-        id: 'qst14',
-        text: 'Which word is an adverb in the sentence: "She quickly solved the difficult puzzle."',
-        options: ['She', 'quickly', 'difficult', 'puzzle'],
-        correctAnswer: 1,
+        id: 'q1-4',
+        text: 'Solve for y: 3y - 7 = 8',
+        options: ['y = 5', 'y = 1', 'y = 15/3', 'y = 5/3'],
+        correctAnswer: 0,
+        explanation: 'Add 7 to both sides: 3y - 7 + 7 = 8 + 7, so 3y = 15. Then divide by 3: y = 15/3 = 5'
       },
       {
-        id: 'qst15',
-        text: 'Which of these is a compound sentence?',
-        options: [
-          'The cat sat on the mat.',
-          'The cat sat on the mat and the dog slept by the fire.',
-          'The cat, which was black, sat on the mat.',
-          'Sitting on the mat, the cat purred contentedly.',
-        ],
+        id: 'q1-5',
+        text: 'If 2x + 3y = 12 and y = 2, what is x?',
+        options: ['x = 3', 'x = 6', 'x = 3/2', 'x = 3/4'],
+        correctAnswer: 2,
+        explanation: 'Substitute y = 2 into the equation: 2x + 3(2) = 12, so 2x + 6 = 12. Subtract 6 from both sides: 2x = 6. Divide by 2: x = 3'
+      }
+    ]
+  },
+  {
+    id: '2',
+    title: 'Photosynthesis Quiz',
+    subjectId: '2',
+    description: 'Test your understanding of how plants make their own food',
+    totalQuestions: 4,
+    timeLimit: 8,
+    completed: true,
+    score: 75,
+    questions: [
+      {
+        id: 'q2-1',
+        text: 'What gas do plants take in during photosynthesis?',
+        options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Hydrogen'],
         correctAnswer: 1,
+        explanation: 'Plants take in carbon dioxide (CO2) during photosynthesis, which they use to produce glucose.'
       },
-    ],
-  },
-];
-
-export const badges: Badge[] = [
-  {
-    id: 'b1',
-    title: 'Math Master',
-    description: 'Complete all mathematics lessons with at least 80% score',
-    imageUrl: '/placeholder.svg',
-    earned: true,
-    earnedDate: '2023-04-15T10:20:00Z',
-  },
-  {
-    id: 'b2',
-    title: 'Science Explorer',
-    description: 'Complete 5 science experiments',
-    imageUrl: '/placeholder.svg',
-    earned: true,
-    earnedDate: '2023-03-22T14:15:00Z',
-  },
-  {
-    id: 'b3',
-    title: 'Bookworm',
-    description: 'Read 10 literature pieces and complete their quizzes',
-    imageUrl: '/placeholder.svg',
-    earned: false,
+      {
+        id: 'q2-2',
+        text: 'Where does photosynthesis occur in plant cells?',
+        options: ['Mitochondria', 'Nucleus', 'Chloroplasts', 'Vacuole'],
+        correctAnswer: 2,
+        explanation: 'Photosynthesis occurs in the chloroplasts, which contain chlorophyll that captures light energy.'
+      },
+      {
+        id: 'q2-3',
+        text: 'What is the main pigment responsible for capturing light energy in plants?',
+        options: ['Chlorophyll', 'Melanin', 'Hemoglobin', 'Carotene'],
+        correctAnswer: 0,
+        explanation: 'Chlorophyll is the main pigment that captures light energy for photosynthesis, giving plants their green color.'
+      },
+      {
+        id: 'q2-4',
+        text: 'Which of the following is NOT a product of photosynthesis?',
+        options: ['Glucose', 'Oxygen', 'Water', 'ATP'],
+        correctAnswer: 3,
+        explanation: 'The main products of photosynthesis are glucose and oxygen. ATP is produced during cellular respiration.'
+      }
+    ]
   },
   {
-    id: 'b4',
-    title: 'History Buff',
-    description: 'Score 90% or higher on all history quizzes',
-    imageUrl: '/placeholder.svg',
-    earned: false,
-  },
-  {
-    id: 'b5',
-    title: 'Dedicated Learner',
-    description: 'Study for 10 days in a row',
-    imageUrl: '/placeholder.svg',
-    earned: true,
-    earnedDate: '2023-05-01T09:30:00Z',
-  },
-];
-
-export const leaderboard: LeaderboardEntry[] = [
-  { id: 'l1', name: 'Emma W.', avatar: '/placeholder.svg', xp: 4200, level: 18, class: '10th Grade' },
-  { id: 'l2', name: 'Alex Johnson', avatar: '/placeholder.svg', xp: 3450, level: 15, class: '10th Grade' },
-  { id: 'l3', name: 'Ryan T.', avatar: '/placeholder.svg', xp: 3300, level: 14, class: '10th Grade' },
-  { id: 'l4', name: 'Sophia L.', avatar: '/placeholder.svg', xp: 3100, level: 13, class: '10th Grade' },
-  { id: 'l5', name: 'Daniel K.', avatar: '/placeholder.svg', xp: 2800, level: 12, class: '10th Grade' },
-];
-
-export const weeklyActivity: WeeklyActivity[] = [
-  { day: 'Mon', minutes: 45 },
-  { day: 'Tue', minutes: 30 },
-  { day: 'Wed', minutes: 60 },
-  { day: 'Thu', minutes: 20 },
-  { day: 'Fri', minutes: 50 },
-  { day: 'Sat', minutes: 10 },
-  { day: 'Sun', minutes: 40 },
+    id: '3',
+    title: 'Shakespeare\'s Plays',
+    subjectId: '3',
+    description: 'Test your knowledge of Shakespeare\'s famous works',
+    totalQuestions: 4,
+    timeLimit: 6,
+    completed: false,
+    questions: [
+      {
+        id: 'q3-1',
+        text: 'Which play features the line "To be, or not to be"?',
+        options: ['Macbeth', 'Romeo and Juliet', 'Hamlet', 'King Lear'],
+        correctAnswer: 2,
+        explanation: 'The famous soliloquy "To be, or not to be" appears in Act III, Scene 1 of Hamlet.'
+      },
+      {
+        id: 'q3-2',
+        text: 'In which city is "Romeo and Juliet" set?',
+        options: ['Venice', 'Verona', 'Rome', 'Florence'],
+        correctAnswer: 1,
+        explanation: 'Romeo and Juliet is set in Verona, Italy, where the two feuding families (Montagues and Capulets) live.'
+      },
+      {
+        id: 'q3-3',
+        text: 'Which character speaks the line "All the world\'s a stage"?',
+        options: ['Hamlet', 'Macbeth', 'Jacques', 'Othello'],
+        correctAnswer: 2,
+        explanation: 'Jacques speaks this famous line in "As You Like It" (Act II, Scene 7).'
+      },
+      {
+        id: 'q3-4',
+        text: 'How many plays is Shakespeare generally credited with writing?',
+        options: ['25', '37', '42', '50'],
+        correctAnswer: 1,
+        explanation: 'Shakespeare is generally credited with writing 37 plays, although some scholars debate the exact number.'
+      }
+    ]
+  }
 ];

@@ -25,11 +25,13 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, Headphones, BookOpen, GraduationCap } from 'lucide-react';
 import { subjects, lessons as allLessons, Lesson } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Lessons = () => {
+  const navigate = useNavigate();
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
@@ -68,6 +70,15 @@ const Lessons = () => {
     return subject ? subject.name : '';
   };
 
+  const getSubjectIcon = (id: string) => {
+    const subjectName = getSubjectName(id).toLowerCase();
+    if (subjectName.includes('math')) return <span className="text-blue-500">∑</span>;
+    if (subjectName.includes('science')) return <span className="text-green-500">⚗️</span>;
+    if (subjectName.includes('english')) return <span className="text-purple-500">📚</span>;
+    if (subjectName.includes('history')) return <span className="text-amber-500">🏺</span>;
+    return <BookOpen className="h-4 w-4" />;
+  };
+
   const handleMarkComplete = () => {
     if (selectedLesson) {
       const updatedLessons = lessons.map(lesson =>
@@ -80,6 +91,11 @@ const Lessons = () => {
         description: "Your progress has been updated.",
       });
     }
+  };
+
+  const openAITutor = (lesson: Lesson) => {
+    // In a real app, this would navigate to the AI Tutor with the specific lesson ID
+    navigate('/ai-tutor', { state: { lessonId: lesson.id } });
   };
 
   return (
@@ -124,31 +140,54 @@ const Lessons = () => {
           {filteredLessons.map(lesson => (
             <Card key={lesson.id} className="overflow-hidden transition-all hover:shadow-md">
               <CardHeader className="pb-2">
-                <CardDescription className="text-sm font-medium text-inlustro-blue">
-                  {getSubjectName(lesson.subjectId)}
-                </CardDescription>
-                <CardTitle className="line-clamp-1">{lesson.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {lesson.duration}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    {getSubjectIcon(lesson.subjectId)}
+                    <CardDescription className="text-sm font-medium text-inlustro-blue">
+                      {getSubjectName(lesson.subjectId)}
+                    </CardDescription>
+                  </div>
                   <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(lesson.status)}`}>
                     {getStatusIcon(lesson.status)}
                     <span className="ml-1">{lesson.status}</span>
                   </span>
                 </div>
+                <CardTitle className="line-clamp-1 mt-1">{lesson.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="line-clamp-2 text-sm text-muted-foreground">{lesson.description || "Learn about this fascinating topic with our interactive lessons."}</p>
+                
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {lesson.duration}
+                  </Badge>
+                  {lesson.hasVoiceTutor && (
+                    <Badge variant="outline" className="flex items-center gap-1 bg-inlustro-blue-light text-inlustro-blue-dark">
+                      <Headphones className="h-3 w-3" />
+                      AI Voice Tutor
+                    </Badge>
+                  )}
+                </div>
               </CardContent>
-              <CardFooter className="pb-4">
+              <CardFooter className="grid grid-cols-2 gap-2 pt-0">
                 <Button 
-                  variant="outline" 
-                  className="w-full"
+                  variant="outline"
                   onClick={() => setSelectedLesson(lesson)}
                 >
+                  <BookOpen className="mr-1 h-4 w-4" />
                   View Lesson
                 </Button>
+                {lesson.hasVoiceTutor && (
+                  <Button 
+                    variant="default"
+                    onClick={() => openAITutor(lesson)}
+                    className="bg-gradient-to-r from-inlustro-blue to-inlustro-blue-dark"
+                  >
+                    <Headphones className="mr-1 h-4 w-4" />
+                    AI Tutor
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
@@ -164,13 +203,38 @@ const Lessons = () => {
         {selectedLesson && (
           <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{selectedLesson.title}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                {getSubjectIcon(selectedLesson.subjectId)}
+                {selectedLesson.title}
+              </DialogTitle>
               <DialogDescription>
                 {getSubjectName(selectedLesson.subjectId)} - {selectedLesson.duration}
               </DialogDescription>
             </DialogHeader>
             
             <div className="mt-4 space-y-4">
+              {selectedLesson.hasVoiceTutor && (
+                <Card className="bg-inlustro-blue-light/20 border-inlustro-blue">
+                  <CardContent className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-5 w-5 text-inlustro-blue" />
+                      <span className="font-medium">This lesson has an interactive AI Voice Tutor</span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedLesson(null);
+                        openAITutor(selectedLesson);
+                      }}
+                    >
+                      <Headphones className="mr-1 h-4 w-4" />
+                      Start Voice Lesson
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+              
               <div dangerouslySetInnerHTML={{ __html: selectedLesson.content }} />
             </div>
             

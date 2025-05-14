@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,6 +54,21 @@ const Profile = () => {
   
   // Get user initials for avatar fallback
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
+
+  // Create array of grade options from 1st to 12th
+  const gradeOptions = Array.from({ length: 12 }, (_, i) => `${i + 1}${getSuffix(i + 1)} Grade`);
+  
+  // Get suffix for number (1st, 2nd, 3rd, etc.)
+  function getSuffix(num: number) {
+    if (num >= 11 && num <= 13) return 'th';
+    
+    switch (num % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -128,10 +142,9 @@ const Profile = () => {
                     <SelectValue placeholder="Select Class" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="9th Grade">9th Grade</SelectItem>
-                    <SelectItem value="10th Grade">10th Grade</SelectItem>
-                    <SelectItem value="11th Grade">11th Grade</SelectItem>
-                    <SelectItem value="12th Grade">12th Grade</SelectItem>
+                    {gradeOptions.map((grade) => (
+                      <SelectItem key={grade} value={grade}>{grade}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
