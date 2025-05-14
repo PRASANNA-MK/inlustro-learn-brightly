@@ -4,11 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { currentUser, badges as allBadges, leaderboard } from '@/data/mockData';
+import { currentUser, badges, leaderboard } from '@/data/mockData';
 
 const Gamification = () => {
-  const earnedBadges = allBadges.filter(badge => badge.earned);
-  const lockedBadges = allBadges.filter(badge => !badge.earned);
+  const earnedBadges = badges.filter(badge => badge.earned);
+  const lockedBadges = badges.filter(badge => !badge.earned);
   const nextLevelXp = 4000; // Sample XP needed for the next level
   const progressToNextLevel = (currentUser.xp / nextLevelXp) * 100;
   

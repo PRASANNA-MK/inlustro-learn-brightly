@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Home, Book, GraduationCap, User, MessageSquare } from 'lucide-react';
 
 const AppSidebar = () => {
-  const { isOpen, setIsOpen } = useSidebar();
+  const { open, setOpen } = useSidebar();
 
   const navItems = [
     {
@@ -42,7 +43,7 @@ const AppSidebar = () => {
   return (
     <aside
       className={`fixed left-0 top-0 z-50 flex h-full flex-col justify-between overflow-y-auto border-r bg-sidebar shadow-md transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+        open ? 'translate-x-0' : '-translate-x-full'
       } w-64`}
     >
       <div className="px-6 py-4">
@@ -61,7 +62,7 @@ const AppSidebar = () => {
                     : 'text-sidebar-foreground'
                 }`
               }
-              onClick={() => setIsOpen(false)}
+              onClick={() => setOpen(false)}
             >
               {item.icon}
               <span>{item.label}</span>

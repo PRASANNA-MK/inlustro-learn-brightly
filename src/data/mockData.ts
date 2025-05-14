@@ -3,6 +3,10 @@ import { User as UserIcon, Book, Code, GraduationCap, ListChecks, Presentation, 
 export interface Subject {
   id: string;
   name: string;
+  lessonsCompleted: number;
+  totalLessons: number;
+  progress: number;
+  color: string;
 }
 
 export interface User {
@@ -16,6 +20,24 @@ export interface User {
   lastLogin: string;
   language: string;
   theme: 'light' | 'dark';
+}
+
+export interface Badge {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  earned: boolean;
+  earnedDate?: string;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  avatar: string;
+  class: string;
+  level: number;
+  xp: number;
 }
 
 export const navigation = [
@@ -58,19 +80,35 @@ export const navigation = [
 export const subjects: Subject[] = [
   {
     id: '1',
-    name: 'Math'
+    name: 'Math',
+    lessonsCompleted: 8,
+    totalLessons: 12,
+    progress: 67,
+    color: '#33C3F0'
   },
   {
     id: '2',
-    name: 'Science'
+    name: 'Science',
+    lessonsCompleted: 5,
+    totalLessons: 10,
+    progress: 50,
+    color: '#4CAF50'
   },
   {
     id: '3',
-    name: 'English'
+    name: 'English',
+    lessonsCompleted: 3,
+    totalLessons: 8,
+    progress: 38,
+    color: '#FF9800'
   },
   {
     id: '4',
-    name: 'History'
+    name: 'History',
+    lessonsCompleted: 6,
+    totalLessons: 9,
+    progress: 67,
+    color: '#9C27B0'
   }
 ];
 
@@ -317,4 +355,101 @@ export const quizzes: Quiz[] = [
       }
     ]
   }
+];
+
+// Add badges data
+export const badges: Badge[] = [
+  {
+    id: 'badge-1',
+    title: 'First Lesson',
+    description: 'Completed your first lesson',
+    imageUrl: '/placeholder.svg',
+    earned: true,
+    earnedDate: new Date(2023, 9, 15).toISOString()
+  },
+  {
+    id: 'badge-2',
+    title: 'Quiz Master',
+    description: 'Scored 100% on a quiz',
+    imageUrl: '/placeholder.svg',
+    earned: true,
+    earnedDate: new Date(2023, 9, 20).toISOString()
+  },
+  {
+    id: 'badge-3',
+    title: 'Study Streak',
+    description: 'Studied for 5 consecutive days',
+    imageUrl: '/placeholder.svg',
+    earned: true,
+    earnedDate: new Date(2023, 10, 1).toISOString()
+  },
+  {
+    id: 'badge-4',
+    title: 'Subject Expert',
+    description: 'Completed all lessons in a subject',
+    imageUrl: '/placeholder.svg',
+    earned: false
+  },
+  {
+    id: 'badge-5',
+    title: 'Knowledge Explorer',
+    description: 'Tried lessons from all subjects',
+    imageUrl: '/placeholder.svg',
+    earned: false
+  }
+];
+
+// Add leaderboard data
+export const leaderboard: LeaderboardEntry[] = [
+  {
+    id: 'user-2',
+    name: 'Emma Watson',
+    avatar: '/placeholder.svg',
+    class: '10th Grade',
+    level: 8,
+    xp: 780
+  },
+  {
+    id: 'user-3',
+    name: 'Noah Smith',
+    avatar: '/placeholder.svg',
+    class: '10th Grade',
+    level: 7,
+    xp: 720
+  },
+  {
+    id: 'user-1',
+    name: 'John Doe',
+    avatar: '/placeholder.svg',
+    class: '10th Grade',
+    level: 5,
+    xp: 450
+  },
+  {
+    id: 'user-4',
+    name: 'Olivia Brown',
+    avatar: '/placeholder.svg',
+    class: '10th Grade',
+    level: 4,
+    xp: 380
+  },
+  {
+    id: 'user-5',
+    name: 'William Johnson',
+    avatar: '/placeholder.svg',
+    class: '10th Grade',
+    level: 3,
+    xp: 320
+  }
+];
+
+// Add weekly activity data
+export const weeklyActivity = [
+  { day: 'Mon', minutes: 45 },
+  { day: 'Tue', minutes: 65 },
+  { day: 'Wed', minutes: 30 },
+  { day: 'Thu', minutes: 50 },
+  { day: 'Fri', minutes: 75 },
+  { day: 'Sat', minutes: 90 },
+  { day: 'Sun', minutes: 40 }
 ];
