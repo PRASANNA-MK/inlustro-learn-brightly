@@ -8,10 +8,11 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Lessons from "./pages/Lessons";
 import Quizzes from "./pages/Quizzes";
-import Progress from "./pages/Progress";
 import Gamification from "./pages/Gamification";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AIVoiceTutor from "./pages/AIVoiceTutor";
+import Chatbot from "./pages/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -26,9 +27,10 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/lessons" element={<Lessons />} />
             <Route path="/quizzes" element={<Quizzes />} />
-            <Route path="/progress" element={<Progress />} />
             <Route path="/gamification" element={<Gamification />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/ai-tutor" element={<AIVoiceTutor />} />
+            <Route path="/chatbot" element={<Chatbot />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

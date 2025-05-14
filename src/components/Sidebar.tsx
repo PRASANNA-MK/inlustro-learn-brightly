@@ -8,6 +8,8 @@ import {
   Home,
   Award,
   User,
+  MessageSquare,
+  Mic,
 } from 'lucide-react';
 import {
   Sidebar as SidebarComponent,
@@ -25,7 +27,8 @@ const items = [
   { title: 'Dashboard', url: '/', icon: Home },
   { title: 'Lessons', url: '/lessons', icon: Book },
   { title: 'Quizzes', url: '/quizzes', icon: FileQuestion },
-  { title: 'Progress', url: '/progress', icon: BarChart3 },
+  { title: 'AI Voice Tutor', url: '/ai-tutor', icon: Mic },
+  { title: 'Chatbot', url: '/chatbot', icon: MessageSquare },
   { title: 'Gamification', url: '/gamification', icon: Award },
   { title: 'Profile', url: '/profile', icon: User },
 ];
