@@ -1,11 +1,14 @@
 
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Home, Book, GraduationCap, User, MessageSquare } from 'lucide-react';
+import { Home, Book, GraduationCap, User, MessageSquare, ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const AppSidebar = () => {
   const { open, setOpen } = useSidebar();
+  const location = useLocation();
 
   const navItems = [
     {
@@ -40,42 +43,77 @@ const AppSidebar = () => {
     },
   ];
 
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+
   return (
-    <aside
-      className={`fixed left-0 top-0 z-50 flex h-full flex-col justify-between overflow-y-auto border-r bg-sidebar shadow-md transition-transform duration-300 ease-in-out ${
-        open ? 'translate-x-0' : '-translate-x-full'
-      } w-64`}
-    >
-      <div className="px-6 py-4">
-        <Link to="/" className="mb-6 inline-block">
-          <span className="font-bold text-xl">InLustro</span>
-        </Link>
-        <nav className="space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `group flex items-center space-x-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-                  isActive
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                    : 'text-sidebar-foreground'
-                }`
-              }
+    <>
+      {/* Desktop sidebar */}
+      <div
+        className={cn(
+          "fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out",
+          open ? "translate-x-0" : "-translate-x-64"
+        )}
+      >
+        <div className="h-full w-64 bg-white border-r shadow-sm overflow-y-auto">
+          <div className="flex justify-between items-center p-4 border-b">
+            <Link to="/" className="font-bold text-xl">InLustro</Link>
+            <Button 
+              variant="ghost" 
+              size="icon"
               onClick={() => setOpen(false)}
+              className="md:flex hidden" 
             >
-              {item.icon}
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          </div>
+          <div className="p-4">
+            <nav className="space-y-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      "hover:bg-gray-100 hover:text-gray-900",
+                      isActive || isActive(item.path)
+                        ? "bg-primary text-white"
+                        : "text-gray-700"
+                    )
+                  }
+                >
+                  {item.icon}
+                  <span className="ml-3">{item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t text-xs text-gray-500 text-center">
+            © {new Date().getFullYear()} InLustro
+          </div>
+        </div>
       </div>
-      <div className="border-t px-6 py-4">
-        <p className="text-xs text-sidebar-foreground">
-          © {new Date().getFullYear()} InLustro
-        </p>
-      </div>
-    </aside>
+      
+      {/* Overlay for mobile - closes sidebar when clicking outside */}
+      {open && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-30 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      
+      {/* Main content padding adjustment based on sidebar state */}
+      <div 
+        className={cn(
+          "w-full transition-all duration-300",
+          open ? "md:pl-64" : "pl-0"
+        )}
+      />
+    </>
   );
 };
 

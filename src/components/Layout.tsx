@@ -11,11 +11,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen w-full bg-gray-50">
+      <div className="min-h-screen w-full bg-gray-50 flex flex-col">
         <Header />
-        <div className="flex w-full">
+        <div className="flex flex-1 w-full relative">
           <AppSidebar />
-          <main className="flex-1 overflow-auto p-4 md:p-6">
+          <main className="flex-1 transition-all duration-300 p-4 md:p-6">
             <div className="mx-auto max-w-7xl">
               {children}
             </div>

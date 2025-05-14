@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const { open, setOpen } = useSidebar();
   const [notifications] = useState([
     { id: 'n1', text: 'New quiz available!', time: '10m ago' },
     { id: 'n2', text: 'You earned a new badge', time: '1h ago' },
@@ -26,11 +27,17 @@ const Header = () => {
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="h-9 w-9 rounded-md border p-1 md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpen(!open)}
+          className="mr-2"
+          aria-label="Toggle sidebar"
+        >
           <Menu className="h-5 w-5" />
-        </SidebarTrigger>
+        </Button>
         <Link to="/" className="flex items-center gap-2">
           <img src="/lovable-uploads/780e4ace-8ec8-4138-8f5e-e69619c11190.png" alt="InLustro Logo" className="h-10 w-auto" />
           <span className="hidden text-xl font-bold md:inline-block">
