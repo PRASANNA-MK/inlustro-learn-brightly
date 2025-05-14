@@ -76,11 +76,11 @@ const AppSidebar = () => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={({ isActive }) =>
+                  className={({ isActive: active }) =>
                     cn(
                       "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                       "hover:bg-gray-100 hover:text-gray-900",
-                      isActive || isActive(item.path)
+                      active || isActive(item.path)
                         ? "bg-primary text-white"
                         : "text-gray-700"
                     )
