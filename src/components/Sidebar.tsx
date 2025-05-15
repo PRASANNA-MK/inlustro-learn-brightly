@@ -59,7 +59,7 @@ const AppSidebar = () => {
       {/* Desktop sidebar */}
       <div
         className={cn(
-          "fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out",
+          "fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] transition-all duration-300 ease-in-out",
           open ? "translate-x-0" : "-translate-x-64"
         )}
       >
@@ -106,7 +106,7 @@ const AppSidebar = () => {
       {/* Overlay for mobile - closes sidebar when clicking outside */}
       {open && (
         <div 
-          className="fixed inset-0 bg-black/20 z-30 md:hidden"
+          className="fixed inset-0 bg-black/20 z-20 md:hidden"
           onClick={() => setOpen(false)}
         />
       )}
@@ -114,8 +114,8 @@ const AppSidebar = () => {
       {/* Main content padding adjustment based on sidebar state */}
       <div 
         className={cn(
-          "w-full transition-all duration-300",
-          open ? "md:pl-64" : "pl-0"
+          "flex-1 transition-all duration-300",
+          open ? "md:ml-64" : "ml-0"
         )}
       />
     </>

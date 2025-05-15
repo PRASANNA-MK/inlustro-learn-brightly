@@ -17,8 +17,8 @@ const Dashboard = () => {
         </p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-3">
-        <Link to="/exam-preparation">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link to="/exam-preparation" className="block">
           <Card className="h-full hover:shadow-md transition-all">
             <CardHeader className="pb-2">
               <FileText className="h-8 w-8 text-primary" />
@@ -34,7 +34,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         
-        <Link to="/teachers">
+        <Link to="/teachers" className="block">
           <Card className="h-full hover:shadow-md transition-all">
             <CardHeader className="pb-2">
               <Users className="h-8 w-8 text-primary" />
@@ -50,7 +50,7 @@ const Dashboard = () => {
           </Card>
         </Link>
         
-        <Link to="/submissions">
+        <Link to="/submissions" className="block">
           <Card className="h-full hover:shadow-md transition-all">
             <CardHeader className="pb-2">
               <ClipboardEdit className="h-8 w-8 text-primary" />
@@ -67,7 +67,7 @@ const Dashboard = () => {
         </Link>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
