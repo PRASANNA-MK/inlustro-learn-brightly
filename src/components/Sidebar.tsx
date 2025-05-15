@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Home, Book, GraduationCap, User, MessageSquare, ChevronLeft } from 'lucide-react';
+import { Home, Book, User, MessageSquare, ChevronLeft, FileText, Users, ClipboardEdit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -17,19 +17,24 @@ const AppSidebar = () => {
       icon: <Home className="h-4 w-4" />,
     },
     {
-      path: '/lessons',
-      label: 'Lessons',
-      icon: <Book className="h-4 w-4" />,
+      path: '/exam-preparation',
+      label: 'Exam Preparation',
+      icon: <FileText className="h-4 w-4" />,
     },
     {
-      path: '/quizzes',
-      label: 'Quizzes',
-      icon: <GraduationCap className="h-4 w-4" />,
+      path: '/teachers',
+      label: 'Teachers',
+      icon: <Users className="h-4 w-4" />,
+    },
+    {
+      path: '/submissions',
+      label: 'Submissions',
+      icon: <ClipboardEdit className="h-4 w-4" />,
     },
     {
       path: '/ai-tutor',
       label: 'AI Voice Tutor',
-      icon: <GraduationCap className="h-4 w-4" />,
+      icon: <Book className="h-4 w-4" />,
     },
     {
       path: '/chatbot',
@@ -60,7 +65,7 @@ const AppSidebar = () => {
       >
         <div className="h-full w-64 bg-white border-r shadow-sm overflow-y-auto">
           <div className="flex justify-between items-center p-4 border-b">
-            <Link to="/" className="font-bold text-xl">InLustro</Link>
+            <Link to="/" className="font-bold text-xl">InLustro Admin</Link>
             <Button 
               variant="ghost" 
               size="icon"
@@ -93,7 +98,7 @@ const AppSidebar = () => {
             </nav>
           </div>
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t text-xs text-gray-500 text-center">
-            © {new Date().getFullYear()} InLustro
+            © {new Date().getFullYear()} InLustro Admin
           </div>
         </div>
       </div>

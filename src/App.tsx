@@ -6,9 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import Lessons from "./pages/Lessons";
-import Quizzes from "./pages/Quizzes";
-import Gamification from "./pages/Gamification";
+import ExamPreparation from "./pages/ExamPreparation";
+import Teachers from "./pages/Teachers";
+import Submissions from "./pages/Submissions";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AIVoiceTutor from "./pages/AIVoiceTutor";
@@ -25,9 +25,9 @@ const App = () => (
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/lessons" element={<Lessons />} />
-            <Route path="/quizzes" element={<Quizzes />} />
-            <Route path="/gamification" element={<Gamification />} />
+            <Route path="/exam-preparation" element={<ExamPreparation />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/submissions" element={<Submissions />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/ai-tutor" element={<AIVoiceTutor />} />
             <Route path="/chatbot" element={<Chatbot />} />

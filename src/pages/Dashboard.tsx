@@ -2,97 +2,89 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { currentUser, subjects, weeklyActivity, badges } from '@/data/mockData';
+import { currentUser, weeklyActivity } from '@/data/mockData';
+import { Button } from '@/components/ui/button';
+import { FileText, Users, ClipboardEdit } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
-  const earnedBadges = badges.filter(badge => badge.earned).slice(0, 3);
-  
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back, {currentUser.name}!</h1>
-        <p className="text-muted-foreground">Continue your learning journey and track your progress.</p>
+        <p className="text-muted-foreground">
+          {currentUser.role === 'admin' ? 'Manage your school and teachers.' : 'Prepare exams and view student submissions.'}
+        </p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Your Level</CardTitle>
-            <CardDescription>Current progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-5xl font-bold">{currentUser.level}</p>
-                <p className="text-sm text-muted-foreground">Level</p>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm font-medium">XP: {currentUser.xp} / 4000</p>
-                </div>
-                <div className="h-2 w-40 rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-inlustro-blue" style={{ width: `${(currentUser.xp / 4000) * 100}%` }} />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-3">
+        <Link to="/exam-preparation">
+          <Card className="h-full hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <FileText className="h-8 w-8 text-primary" />
+              <CardTitle className="mt-2">Create Exam</CardTitle>
+              <CardDescription>Create and manage exam papers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Create custom exams with different difficulty levels and share with students.
+              </p>
+              <Button className="mt-4 w-full">Get Started</Button>
+            </CardContent>
+          </Card>
+        </Link>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Recent Badges</CardTitle>
-            <CardDescription>Your latest achievements</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              {earnedBadges.map((badge) => (
-                <div key={badge.id} className="flex flex-col items-center">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-inlustro-blue to-inlustro-blue-dark flex items-center justify-center">
-                    <img src={badge.imageUrl} alt={badge.title} className="h-8 w-8" />
-                  </div>
-                  <p className="mt-1 text-xs">{badge.title}</p>
-                </div>
-              ))}
-              {earnedBadges.length === 0 && (
-                <p className="text-sm text-muted-foreground">No badges earned yet. Complete lessons and quizzes to earn badges!</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <Link to="/teachers">
+          <Card className="h-full hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <Users className="h-8 w-8 text-primary" />
+              <CardTitle className="mt-2">Manage Teachers</CardTitle>
+              <CardDescription>View and manage teacher accounts</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                View teacher profiles, manage permissions, and assign classes.
+              </p>
+              <Button className="mt-4 w-full">View Teachers</Button>
+            </CardContent>
+          </Card>
+        </Link>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Current Class</CardTitle>
-            <CardDescription>Your assigned class</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col space-y-1">
-              <p className="text-2xl font-bold">{currentUser.class}</p>
-              <p className="text-sm text-muted-foreground">Academic Year 2023-2024</p>
-            </div>
-          </CardContent>
-        </Card>
+        <Link to="/submissions">
+          <Card className="h-full hover:shadow-md transition-all">
+            <CardHeader className="pb-2">
+              <ClipboardEdit className="h-8 w-8 text-primary" />
+              <CardTitle className="mt-2">View Submissions</CardTitle>
+              <CardDescription>Track student submissions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                View and grade student exam submissions and track progress.
+              </p>
+              <Button className="mt-4 w-full">Check Submissions</Button>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
       
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Subject Progress</CardTitle>
-            <CardDescription>Your progress in each subject</CardDescription>
+            <CardTitle>Recent Activities</CardTitle>
+            <CardDescription>Your activities in the past week</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {subjects.map(subject => (
-                <div key={subject.id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{subject.name}</span>
-                    <span className="text-xs text-muted-foreground">{subject.lessonsCompleted} / {subject.totalLessons} lessons</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div className="progress-bar-value" style={{ width: `${subject.progress}%`, backgroundColor: subject.color }} />
-                  </div>
-                </div>
-              ))}
+          <CardContent className="space-y-4">
+            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+              <p className="text-sm font-medium">Math Exam Created</p>
+              <p className="text-xs text-muted-foreground">2 hours ago</p>
+            </div>
+            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+              <p className="text-sm font-medium">Physics Exam Shared</p>
+              <p className="text-xs text-muted-foreground">Yesterday</p>
+            </div>
+            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+              <p className="text-sm font-medium">New Teacher Added</p>
+              <p className="text-xs text-muted-foreground">2 days ago</p>
             </div>
           </CardContent>
         </Card>
@@ -100,7 +92,7 @@ const Dashboard = () => {
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Weekly Activity</CardTitle>
-            <CardDescription>Minutes spent learning this week</CardDescription>
+            <CardDescription>Minutes spent on platform this week</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -108,7 +100,7 @@ const Dashboard = () => {
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip 
-                  formatter={(value) => [`${value} min`, 'Study Time']}
+                  formatter={(value) => [`${value} min`, 'Active Time']}
                   labelFormatter={(label) => `${label}`}
                 />
                 <Bar dataKey="minutes" fill="#33C3F0" radius={[4, 4, 0, 0]} />

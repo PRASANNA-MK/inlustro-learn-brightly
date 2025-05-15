@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Header />
         <div className="flex flex-1 w-full relative">
           <AppSidebar />
-          <main className="flex-1 transition-all duration-300 p-4 md:p-6">
+          <main className="flex-1 transition-all duration-300 p-4 md:p-6 overflow-x-hidden">
             <div className="mx-auto max-w-7xl">
               {children}
             </div>
