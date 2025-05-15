@@ -16,11 +16,13 @@ export interface Quiz {
   grade: string;
   questions: Question[];
   totalQuestions: number;
-  timeLimit: number;
+  timeLimit: number; // in minutes
   createdAt: string;
   updatedAt: string;
   createdBy: string;
   status: 'draft' | 'published' | 'archived';
+  completed?: boolean; // Added for UI compatibility
+  score?: number; // Added for UI compatibility
   difficultyBreakdown: {
     easy: number;
     medium: number;
@@ -67,6 +69,8 @@ export const quizzes: Quiz[] = [
     updatedAt: "2024-05-10T10:00:00Z",
     createdBy: "Teacher Smith",
     status: "published",
+    completed: true,
+    score: 85,
     difficultyBreakdown: {
       easy: 33,
       medium: 33,
@@ -103,6 +107,7 @@ export const quizzes: Quiz[] = [
     updatedAt: "2024-05-12T14:30:00Z",
     createdBy: "Teacher Jones",
     status: "draft",
+    completed: false,
     difficultyBreakdown: {
       easy: 50,
       medium: 50,
@@ -160,6 +165,8 @@ export const quizzes: Quiz[] = [
     updatedAt: "2024-05-15T09:45:00Z",
     createdBy: "Teacher Wilson",
     status: "published",
+    completed: true,
+    score: 92,
     difficultyBreakdown: {
       easy: 25,
       medium: 50,

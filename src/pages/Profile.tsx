@@ -1,100 +1,37 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Switch } from '@/components/ui/switch';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Mail, Calendar, Globe, Moon, Sun, ShieldCheck, Key } from 'lucide-react';
-import { currentUser as initialUser } from '@/data/mockData';
-import { useToast } from '@/hooks/use-toast';
-
-// Sample teachers data for admin view
-const adminTeachersList = [
-  {
-    id: 1,
-    name: 'Dr. Sarah Johnson',
-    email: 'sarah.johnson@inlustro.edu',
-    role: 'Department Head',
-    subject: 'Mathematics',
-    avatar: null,
-  },
-  {
-    id: 2,
-    name: 'Prof. Michael Chen',
-    email: 'michael.chen@inlustro.edu',
-    role: 'Senior Teacher',
-    subject: 'Physics',
-    avatar: null,
-  },
-  {
-    id: 3,
-    name: 'Mrs. Emily Rodriguez',
-    email: 'emily.rodriguez@inlustro.edu',
-    role: 'Teacher',
-    subject: 'English Literature',
-    avatar: null,
-  }
-];
+import { currentUser } from '@/data/mockData';
+import { toast } from '@/hooks/use-toast';
 
 const Profile = () => {
-  const { toast } = useToast();
+  // Use the user fields that actually exist in our data model
   const [user, setUser] = useState({
-    ...initialUser,
-    role: 'admin' // Setting the user as an admin
+    ...currentUser,
+    theme: currentUser.preferences.theme, // Map from preferences to top level for backward compatibility
+    language: 'English', // Default value
   });
-  const [isDarkMode, setIsDarkMode] = useState(user.theme === 'dark');
-  const [selectedTeacher, setSelectedTeacher] = useState<null | number>(null);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUser(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setUser(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleThemeChange = (checked: boolean) => {
-    setIsDarkMode(checked);
-    setUser(prev => ({ ...prev, theme: checked ? 'dark' : 'light' }));
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [activeTab, setActiveTab] = useState('profile');
+
+  const handleSaveProfile = () => {
     toast({
       title: "Profile updated",
-      description: "Your profile information has been saved successfully.",
+      description: "Your profile information has been saved."
     });
   };
 
-  const handleSwitchToTeacher = (teacherId: number) => {
-    setSelectedTeacher(teacherId);
+  const handleChangePassword = () => {
     toast({
-      title: "Teacher View",
-      description: `You are now viewing as ${adminTeachersList.find(t => t.id === teacherId)?.name}`,
+      title: "Password changed",
+      description: "Your password has been successfully changed."
     });
   };
-  
-  // Format the last login date
-  const formatLastLogin = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
-  };
-  
-  // Get user initials for avatar fallback
-  const userInitials = user.name.split(' ').map(n => n[0]).join('');
-  
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
@@ -102,273 +39,213 @@ const Profile = () => {
         <p className="text-muted-foreground">Manage your account settings and preferences.</p>
       </div>
       
-      <Tabs defaultValue="personal" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="personal">Personal Information</TabsTrigger>
-          <TabsTrigger value="account">Account Security</TabsTrigger>
-          {user.role === 'admin' && (
-            <TabsTrigger value="admin">Admin Options</TabsTrigger>
-          )}
-        </TabsList>
-
-        <TabsContent value="personal">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>Update your personal details.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col items-center space-y-4 md:flex-row md:items-start md:space-x-4 md:space-y-0">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="text-2xl">{userInitials}</AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-1 text-center md:text-left">
-                    <h3 className="text-xl font-bold">{user.name}</h3>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <p className="text-sm text-muted-foreground capitalize">
-                      {user.role} {user.role === 'admin' ? '(Administrator)' : ''}
-                    </p>
-                    <Button variant="outline" size="sm" className="mt-2">
-                      Change Avatar
-                    </Button>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Full Name
-                    </Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      value={user.name} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email Address
-                    </Label>
-                    <Input 
-                      id="email" 
-                      name="email" 
-                      type="email" 
-                      value={user.email} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="title" className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4" />
-                      Title/Position
-                    </Label>
-                    <Input 
-                      id="title" 
-                      name="title" 
-                      value={user.role === 'admin' ? 'School Administrator' : user.class}
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button>Save Changes</Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </TabsContent>
-
-        <TabsContent value="account">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Security</CardTitle>
-              <CardDescription>Manage your account security settings.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Key className="h-4 w-4" />
-                    Password
-                  </Label>
-                  <div className="flex gap-4">
-                    <Input type="password" value="••••••••" disabled />
-                    <Button variant="outline">Change Password</Button>
-                  </div>
-                </div>
-
-                <Separator />
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-Factor Authentication</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
-                  </div>
-                  <Switch checked={true} />
-                </div>
-
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Language
-                  </Label>
-                  <Select
-                    value={user.language}
-                    onValueChange={(value) => handleSelectChange('language', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="English">English</SelectItem>
-                      <SelectItem value="Spanish">Spanish</SelectItem>
-                      <SelectItem value="French">French</SelectItem>
-                      <SelectItem value="German">German</SelectItem>
-                      <SelectItem value="Chinese">Chinese</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="flex items-center gap-2">
-                      {isDarkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                      Dark Mode
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      Switch between light and dark themes
-                    </p>
-                  </div>
-                  <Switch 
-                    checked={isDarkMode}
-                    onCheckedChange={handleThemeChange}
-                  />
+      <div className="flex flex-col lg:flex-row gap-6">
+        <Card className="lg:w-1/3">
+          <CardHeader>
+            <CardTitle>Profile Information</CardTitle>
+            <CardDescription>Update your personal details</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center">
+            <Avatar className="h-32 w-32 mb-4">
+              <AvatarImage src={user.profilePicture || user.avatar} alt={user.name} />
+              <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            </Avatar>
+            
+            <div className="w-full space-y-2">
+              <Button className="w-full" variant="outline">Change Picture</Button>
+              
+              <div className="text-center mt-4">
+                <h3 className="font-medium text-lg">{user.name}</h3>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <div className="mt-2">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  </span>
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline">Cancel</Button>
-              <Button>Save Changes</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        {user.role === 'admin' && (
-          <TabsContent value="admin">
-            <Card>
-              <CardHeader>
-                <CardTitle>Admin Options</CardTitle>
-                <CardDescription>Advanced administrative options.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-base font-medium mb-4">View as Teacher</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Switch to a teacher's view to help troubleshoot issues or provide assistance.
-                  </p>
+              
+              <div className="pt-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span>Last login:</span>
+                  <span>{new Date(user.lastLogin).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle>Account Settings</CardTitle>
+            <CardDescription>Manage your account preferences and security</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full grid grid-cols-3 mb-6">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="preferences">Preferences</TabsTrigger>
+                <TabsTrigger value="security">Security</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="profile" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="text-sm font-medium">Full Name</label>
+                    <Input id="name" value={user.name} onChange={e => setUser({...user, name: e.target.value})} />
+                  </div>
                   
-                  <div className="space-y-4">
-                    {adminTeachersList.map((teacher) => (
-                      <div 
-                        key={teacher.id}
-                        className={`p-4 border rounded-lg flex justify-between items-center ${
-                          selectedTeacher === teacher.id ? 'border-primary bg-primary/5' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={teacher.avatar || ''} />
-                            <AvatarFallback>
-                              {teacher.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{teacher.name}</p>
-                            <p className="text-xs text-muted-foreground">{teacher.role} - {teacher.subject}</p>
-                          </div>
-                        </div>
-                        <Button 
-                          variant={selectedTeacher === teacher.id ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handleSwitchToTeacher(teacher.id)}
-                        >
-                          {selectedTeacher === teacher.id ? 'Current View' : 'Switch View'}
-                        </Button>
-                      </div>
-                    ))}
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium">Email Address</label>
+                    <Input id="email" type="email" value={user.email} onChange={e => setUser({...user, email: e.target.value})} />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="role" className="text-sm font-medium">Role</label>
+                    <Input id="role" value={user.role} disabled />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="class" className="text-sm font-medium">Class</label>
+                    <Input id="class" value={user.class || ''} onChange={e => setUser({...user, class: e.target.value})} />
                   </div>
                 </div>
                 
-                <Separator />
-                
-                <div>
-                  <h3 className="text-base font-medium mb-2">System Settings</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Configure global system settings for all users.
-                  </p>
+                <Button onClick={handleSaveProfile}>Save Changes</Button>
+              </TabsContent>
+              
+              <TabsContent value="preferences" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="theme" className="text-sm font-medium">Theme</label>
+                    <select 
+                      id="theme" 
+                      className="w-full rounded-md border border-input bg-background px-3 py-2" 
+                      value={user.theme} 
+                      onChange={e => setUser({...user, theme: e.target.value})}
+                    >
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                      <option value="system">System</option>
+                    </select>
+                  </div>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Enable Teacher Registration</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Allow teachers to self-register on the platform
-                        </p>
-                      </div>
-                      <Switch checked={false} />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label>Maintenance Mode</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Put the system into maintenance mode
-                        </p>
-                      </div>
-                      <Switch checked={false} />
-                    </div>
+                  <div className="space-y-2">
+                    <label htmlFor="language" className="text-sm font-medium">Language</label>
+                    <select 
+                      id="language" 
+                      className="w-full rounded-md border border-input bg-background px-3 py-2" 
+                      value={user.language} 
+                      onChange={e => setUser({...user, language: e.target.value})}
+                    >
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                      <option value="German">German</option>
+                      <option value="Chinese">Chinese</option>
+                    </select>
+                  </div>
+                  
+                  <div className="col-span-1 md:col-span-2 space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={user.preferences.notificationsEnabled} 
+                        onChange={e => setUser({
+                          ...user, 
+                          preferences: {...user.preferences, notificationsEnabled: e.target.checked}
+                        })} 
+                        className="rounded border-gray-300" 
+                      />
+                      Enable Notifications
+                    </label>
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button>Save Settings</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        )}
-      </Tabs>
+                
+                <Button onClick={handleSaveProfile}>Save Preferences</Button>
+              </TabsContent>
+              
+              <TabsContent value="security" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="current-password" className="text-sm font-medium">Current Password</label>
+                    <Input id="current-password" type="password" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="new-password" className="text-sm font-medium">New Password</label>
+                    <Input id="new-password" type="password" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="confirm-password" className="text-sm font-medium">Confirm New Password</label>
+                    <Input id="confirm-password" type="password" />
+                  </div>
+                </div>
+                
+                <Button onClick={handleChangePassword}>Change Password</Button>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>Account Information</CardTitle>
-          <CardDescription>View your account details.</CardDescription>
+          <CardTitle>Connected Accounts</CardTitle>
+          <CardDescription>Link your accounts for seamless integration</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <p className="text-sm font-medium">User ID</p>
-              <p className="text-lg">ADM-{user.id || '001'}</p>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </div>
+                <div>
+                  <h4 className="font-medium">Facebook</h4>
+                  <p className="text-sm text-muted-foreground">Not connected</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">Connect</Button>
             </div>
-            <div>
-              <p className="text-sm font-medium">Account Type</p>
-              <p className="text-lg capitalize">{user.role || 'Admin'}</p>
+            
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-sky-500"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                </div>
+                <div>
+                  <h4 className="font-medium">Twitter</h4>
+                  <p className="text-sm text-muted-foreground">Connected</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">Disconnect</Button>
             </div>
-            <div className="md:col-span-2">
-              <p className="text-sm font-medium">Last Login</p>
-              <p className="text-lg">{formatLastLogin(user.lastLogin)}</p>
+            
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                </div>
+                <div>
+                  <h4 className="font-medium">YouTube</h4>
+                  <p className="text-sm text-muted-foreground">Not connected</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">Connect</Button>
+            </div>
+            
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                </div>
+                <div>
+                  <h4 className="font-medium">GitHub</h4>
+                  <p className="text-sm text-muted-foreground">Connected</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">Disconnect</Button>
             </div>
           </div>
         </CardContent>

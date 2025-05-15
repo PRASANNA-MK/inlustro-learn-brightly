@@ -15,7 +15,8 @@ export interface Lesson {
   }[];
   createdAt: string;
   createdBy: string;
-  status: 'draft' | 'published' | 'archived';
+  status: 'Not Started' | 'In Progress' | 'Completed'; // Changed for UI compatibility
+  hasVoiceTutor?: boolean; // Added for UI compatibility
 }
 
 export const lessons: Lesson[] = [
@@ -64,7 +65,8 @@ export const lessons: Lesson[] = [
     ],
     createdAt: "2024-04-15T08:30:00Z",
     createdBy: "Teacher Smith",
-    status: "published"
+    status: "Completed",
+    hasVoiceTutor: true
   },
   {
     id: "lesson-2",
@@ -110,7 +112,8 @@ export const lessons: Lesson[] = [
     ],
     createdAt: "2024-04-18T10:15:00Z",
     createdBy: "Teacher Jones",
-    status: "published"
+    status: "In Progress",
+    hasVoiceTutor: false
   },
   {
     id: "lesson-3",
@@ -160,6 +163,7 @@ export const lessons: Lesson[] = [
     ],
     createdAt: "2024-04-22T13:45:00Z",
     createdBy: "Teacher Wilson",
-    status: "draft"
+    status: "Not Started",
+    hasVoiceTutor: true
   }
 ];

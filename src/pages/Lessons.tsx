@@ -38,7 +38,7 @@ const Lessons = () => {
   const [lessons, setLessons] = useState(allLessons);
 
   const filteredLessons = lessons.filter(lesson => {
-    const subjectMatch = selectedSubject === 'all' || lesson.subjectId === selectedSubject;
+    const subjectMatch = selectedSubject === 'all' || lesson.subject === selectedSubject;
     const statusMatch = selectedStatus === 'all' || lesson.status === selectedStatus;
     return subjectMatch && statusMatch;
   });
@@ -67,7 +67,7 @@ const Lessons = () => {
 
   const getSubjectName = (id: string) => {
     const subject = subjects.find(subject => subject.id === id);
-    return subject ? subject.name : '';
+    return subject ? subject.name : id;
   };
 
   const getSubjectIcon = (id: string) => {
@@ -82,9 +82,9 @@ const Lessons = () => {
   const handleMarkComplete = () => {
     if (selectedLesson) {
       const updatedLessons = lessons.map(lesson =>
-        lesson.id === selectedLesson.id ? { ...lesson, status: 'Completed' as const } : lesson
+        lesson.id === selectedLesson.id ? { ...lesson, status: 'Completed' } : lesson
       );
-      setLessons(updatedLessons);
+      setLessons(updatedLessons as Lesson[]);
       setSelectedLesson(null);
       toast({
         title: "Lesson completed!",
@@ -142,9 +142,9 @@ const Lessons = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {getSubjectIcon(lesson.subjectId)}
+                    {getSubjectIcon(lesson.subject)}
                     <CardDescription className="text-sm font-medium text-inlustro-blue">
-                      {getSubjectName(lesson.subjectId)}
+                      {getSubjectName(lesson.subject)}
                     </CardDescription>
                   </div>
                   <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${getStatusClass(lesson.status)}`}>
@@ -160,7 +160,7 @@ const Lessons = () => {
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Badge variant="outline" className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {lesson.duration}
+                    {lesson.duration} minutes
                   </Badge>
                   {lesson.hasVoiceTutor && (
                     <Badge variant="outline" className="flex items-center gap-1 bg-inlustro-blue-light text-inlustro-blue-dark">
@@ -204,11 +204,11 @@ const Lessons = () => {
           <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                {getSubjectIcon(selectedLesson.subjectId)}
+                {getSubjectIcon(selectedLesson.subject)}
                 {selectedLesson.title}
               </DialogTitle>
               <DialogDescription>
-                {getSubjectName(selectedLesson.subjectId)} - {selectedLesson.duration}
+                {getSubjectName(selectedLesson.subject)} - {selectedLesson.duration} minutes
               </DialogDescription>
             </DialogHeader>
             
