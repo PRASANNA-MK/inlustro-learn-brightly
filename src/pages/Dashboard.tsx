@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back, {currentUser.name}!</h1>
         <p className="text-muted-foreground">
@@ -68,7 +68,7 @@ const Dashboard = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="col-span-1">
+        <Card className="h-full">
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
             <CardDescription>Your activities in the past week</CardDescription>
@@ -89,12 +89,12 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="col-span-1">
+        <Card className="h-full">
           <CardHeader>
             <CardTitle>Weekly Activity</CardTitle>
             <CardDescription>Minutes spent on platform this week</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyActivity} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
                 <XAxis dataKey="day" />

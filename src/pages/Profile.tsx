@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,14 +32,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Your Profile</h1>
         <p className="text-muted-foreground">Manage your account settings and preferences.</p>
       </div>
       
-      <div className="flex flex-col lg:flex-row gap-6">
-        <Card className="lg:w-1/3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <Card className="lg:col-span-1 h-fit">
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
             <CardDescription>Update your personal details</CardDescription>
@@ -51,7 +50,7 @@ const Profile = () => {
               <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
             </Avatar>
             
-            <div className="w-full space-y-2">
+            <div className="w-full space-y-4">
               <Button className="w-full" variant="outline">Change Picture</Button>
               
               <div className="text-center mt-4">
@@ -74,7 +73,7 @@ const Profile = () => {
           </CardContent>
         </Card>
         
-        <Card className="flex-1">
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Account Settings</CardTitle>
             <CardDescription>Manage your account preferences and security</CardDescription>

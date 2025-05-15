@@ -111,10 +111,10 @@ const AppSidebar = () => {
         />
       )}
       
-      {/* Main content padding adjustment based on sidebar state */}
+      {/* Main content adjustment based on sidebar state */}
       <div 
         className={cn(
-          "flex-1 transition-all duration-300",
+          "transition-all duration-300",
           open ? "md:ml-64" : "ml-0"
         )}
       />
