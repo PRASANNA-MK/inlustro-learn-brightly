@@ -85,7 +85,7 @@ const AppSidebar = () => {
                     cn(
                       "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                       "hover:bg-gray-100 hover:text-gray-900",
-                      active || isActive(item.path)
+                      (active || isActive(item.path))
                         ? "bg-primary text-white"
                         : "text-gray-700"
                     )
