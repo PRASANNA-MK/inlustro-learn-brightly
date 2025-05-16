@@ -11,7 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen w-full bg-gray-50">
+      <div className="min-h-screen w-full bg-background">
         <Header />
         <div className="flex pt-16 min-h-[calc(100vh-4rem)]">
           <AppSidebar />

@@ -19,9 +19,11 @@ const Dashboard = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link to="/exam-preparation" className="block">
-          <Card className="h-full hover:shadow-md transition-all">
-            <CardHeader className="pb-2">
-              <FileText className="h-8 w-8 text-primary" />
+          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
+                <FileText className="h-6 w-6 text-inlustro-purple" />
+              </div>
               <CardTitle className="mt-2">Create Exam</CardTitle>
               <CardDescription>Create and manage exam papers</CardDescription>
             </CardHeader>
@@ -29,15 +31,17 @@ const Dashboard = () => {
               <p className="text-sm text-muted-foreground">
                 Create custom exams with different difficulty levels and share with students.
               </p>
-              <Button className="mt-4 w-full">Get Started</Button>
+              <Button className="mt-4 w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">Get Started</Button>
             </CardContent>
           </Card>
         </Link>
         
         <Link to="/teachers" className="block">
-          <Card className="h-full hover:shadow-md transition-all">
-            <CardHeader className="pb-2">
-              <Users className="h-8 w-8 text-primary" />
+          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
+                <Users className="h-6 w-6 text-inlustro-purple" />
+              </div>
               <CardTitle className="mt-2">Manage Teachers</CardTitle>
               <CardDescription>View and manage teacher accounts</CardDescription>
             </CardHeader>
@@ -45,15 +49,17 @@ const Dashboard = () => {
               <p className="text-sm text-muted-foreground">
                 View teacher profiles, manage permissions, and assign classes.
               </p>
-              <Button className="mt-4 w-full">View Teachers</Button>
+              <Button className="mt-4 w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">View Teachers</Button>
             </CardContent>
           </Card>
         </Link>
         
         <Link to="/submissions" className="block">
-          <Card className="h-full hover:shadow-md transition-all">
-            <CardHeader className="pb-2">
-              <ClipboardEdit className="h-8 w-8 text-primary" />
+          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
+                <ClipboardEdit className="h-6 w-6 text-inlustro-purple" />
+              </div>
               <CardTitle className="mt-2">View Submissions</CardTitle>
               <CardDescription>Track student submissions</CardDescription>
             </CardHeader>
@@ -61,36 +67,36 @@ const Dashboard = () => {
               <p className="text-sm text-muted-foreground">
                 View and grade student exam submissions and track progress.
               </p>
-              <Button className="mt-4 w-full">Check Submissions</Button>
+              <Button className="mt-4 w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">Check Submissions</Button>
             </CardContent>
           </Card>
         </Link>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="h-full">
-          <CardHeader>
+        <Card className="h-full rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
             <CardTitle>Recent Activities</CardTitle>
             <CardDescription>Your activities in the past week</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
               <p className="text-sm font-medium">Math Exam Created</p>
               <p className="text-xs text-muted-foreground">2 hours ago</p>
             </div>
-            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
               <p className="text-sm font-medium">Physics Exam Shared</p>
               <p className="text-xs text-muted-foreground">Yesterday</p>
             </div>
-            <div className="space-y-2 border-l-2 border-primary pl-4 py-2">
+            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
               <p className="text-sm font-medium">New Teacher Added</p>
               <p className="text-xs text-muted-foreground">2 days ago</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="h-full">
-          <CardHeader>
+        <Card className="h-full rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
             <CardTitle>Weekly Activity</CardTitle>
             <CardDescription>Minutes spent on platform this week</CardDescription>
           </CardHeader>
@@ -103,7 +109,7 @@ const Dashboard = () => {
                   formatter={(value) => [`${value} min`, 'Active Time']}
                   labelFormatter={(label) => `${label}`}
                 />
-                <Bar dataKey="minutes" fill="#33C3F0" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="minutes" fill="#5F65D9" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

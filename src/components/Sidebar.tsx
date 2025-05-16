@@ -63,31 +63,31 @@ const AppSidebar = () => {
           open ? "translate-x-0" : "-translate-x-64"
         )}
       >
-        <div className="h-full w-64 bg-white border-r shadow-sm overflow-y-auto">
-          <div className="flex justify-between items-center p-4 border-b">
-            <Link to="/" className="font-bold text-xl">InLustro Admin</Link>
+        <div className="h-full w-64 bg-inlustro-purple text-white shadow-lg overflow-y-auto">
+          <div className="flex justify-between items-center p-4 border-b border-white/10">
+            <Link to="/" className="font-bold text-xl text-white">InLustro Admin</Link>
             <Button 
               variant="ghost" 
               size="icon"
               onClick={() => setOpen(false)}
-              className="md:flex hidden" 
+              className="md:flex hidden text-white hover:bg-white/10" 
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
           </div>
           <div className="p-4">
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               {navItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   className={({ isActive: active }) =>
                     cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                      "hover:bg-gray-100 hover:text-gray-900",
+                      "flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors",
+                      "hover:bg-white/10",
                       (active || isActive(item.path))
-                        ? "bg-primary text-white"
-                        : "text-gray-700"
+                        ? "bg-white/20 text-white"
+                        : "text-white/80"
                     )
                   }
                 >
@@ -97,7 +97,7 @@ const AppSidebar = () => {
               ))}
             </nav>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t text-xs text-gray-500 text-center">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 text-xs text-white/70 text-center">
             © {new Date().getFullYear()} InLustro Admin
           </div>
         </div>

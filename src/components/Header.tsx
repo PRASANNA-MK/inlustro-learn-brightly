@@ -27,7 +27,7 @@ const Header = () => {
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b bg-white/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
@@ -40,7 +40,7 @@ const Header = () => {
         </Button>
         <Link to="/" className="flex items-center gap-2">
           <img src="/lovable-uploads/780e4ace-8ec8-4138-8f5e-e69619c11190.png" alt="InLustro Logo" className="h-10 w-auto" />
-          <span className="hidden text-xl font-bold md:inline-block">
+          <span className="hidden text-xl font-bold md:inline-block text-inlustro-purple">
             <span>InLustro</span>
           </span>
         </Link>
@@ -51,10 +51,10 @@ const Header = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-inlustro-blue"></span>
+              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-inlustro-purple"></span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuContent align="end" className="w-80 rounded-2xl">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {notifications.map(notification => (
@@ -71,15 +71,15 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-8 w-8 ring-2 ring-inlustro-purple/10">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{userInitials}</AvatarFallback>
+                <AvatarFallback className="bg-inlustro-purple text-white">{userInitials}</AvatarFallback>
               </Avatar>
               <span className="hidden md:inline-block">{user.name}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="rounded-2xl">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

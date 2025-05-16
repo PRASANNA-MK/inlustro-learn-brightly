@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { FileText, Download, Share2 } from 'lucide-react';
+import { FileText, Download, Share2, Upload, FileUp, CheckCircle2, Edit2, CheckSquare, CircleSlash } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 // Mock data
 const subjects = [
@@ -33,6 +34,7 @@ const ExamPreparation = () => {
     hard: 30,
   });
   
+  // For manual creation
   const [questions, setQuestions] = useState([
     { id: 1, text: 'What is the formula for calculating the area of a circle?', difficulty: 'easy' },
     { id: 2, text: 'Solve for x: 3x + 7 = 22', difficulty: 'easy' },
@@ -43,6 +45,68 @@ const ExamPreparation = () => {
   
   const [newQuestion, setNewQuestion] = useState('');
   const [newQuestionDifficulty, setNewQuestionDifficulty] = useState('medium');
+  
+  // For syllabus-based creation
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [syllabusSubject, setSyllabusSubject] = useState('');
+  const [syllabusGrade, setSyllabusGrade] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
+  
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      setUploadedFileName(file.name);
+      toast({
+        title: "File Uploaded",
+        description: `${file.name} has been uploaded successfully.`,
+      });
+    }
+  };
+  
+  const simulateGeneration = () => {
+    if (!syllabusSubject || !syllabusGrade || !uploadedFile) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a subject, grade, and upload a document.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    
+    // Simulate progress updates
+    const interval = setInterval(() => {
+      setGenerationProgress(prev => {
+        const newProgress = prev + 10;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setIsGenerating(false);
+          
+          // Simulate generated questions
+          setGeneratedQuestions([
+            { id: 1, text: 'What is the significance of mitochondria in cellular respiration?', type: 'mcq', options: ['Energy production', 'Protein synthesis', 'Cell division', 'Waste removal'], answer: 'Energy production' },
+            { id: 2, text: 'Explain the process of photosynthesis and its importance in ecosystems.', type: 'essay' },
+            { id: 3, text: 'Calculate the acceleration of an object with a mass of 5kg when a force of 20N is applied.', type: 'problem', answer: '4 m/s²' },
+            { id: 4, text: 'Name the four main tissue types in the human body and give an example of each.', type: 'short_answer' },
+            { id: 5, text: 'True or False: DNA replication is semiconservative.', type: 'true_false', answer: 'True' },
+          ]);
+          
+          setActiveTab('syllabusPreview');
+          toast({
+            title: "Questions Generated",
+            description: "AI has generated questions based on your syllabus document.",
+          });
+        }
+        return newProgress;
+      });
+    }, 500);
+  };
   
   const addQuestion = () => {
     if (newQuestion.trim() === '') {
@@ -158,28 +222,99 @@ const ExamPreparation = () => {
     });
   };
   
+  const renderQuestionEditForm = (question: any, index: number) => {
+    switch(question.type) {
+      case 'mcq':
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Options</Label>
+              <div className="text-sm text-inlustro-purple">Answer: {question.answer}</div>
+            </div>
+            {question.options.map((option: string, i: number) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${question.answer === option ? 'bg-inlustro-purple text-white border-inlustro-purple' : 'border-gray-300'}`}>
+                  {question.answer === option && <CheckSquare className="w-3 h-3" />}
+                </div>
+                <Input value={option} className="rounded-full" onChange={() => {}} />
+              </div>
+            ))}
+          </div>
+        );
+      case 'essay':
+        return (
+          <div className="space-y-3">
+            <Label>Answer Guidelines</Label>
+            <Textarea 
+              placeholder="Enter expected key points for the essay answer..."
+              className="min-h-[100px] rounded-xl"
+            />
+          </div>
+        );
+      case 'problem':
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Answer</Label>
+              <div className="text-sm text-inlustro-purple">Expected: {question.answer}</div>
+            </div>
+            <Input value={question.answer} className="rounded-full" onChange={() => {}} />
+          </div>
+        );
+      case 'true_false':
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${question.answer === 'True' ? 'bg-inlustro-purple text-white border-inlustro-purple' : 'border-gray-300'}`}>
+                  {question.answer === 'True' && <CheckSquare className="w-3 h-3" />}
+                </div>
+                <span>True</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${question.answer === 'False' ? 'bg-inlustro-purple text-white border-inlustro-purple' : 'border-gray-300'}`}>
+                  {question.answer === 'False' && <CheckSquare className="w-3 h-3" />}
+                </div>
+                <span>False</span>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="space-y-3">
+            <Label>Answer Guidelines</Label>
+            <Input placeholder="Sample answer or guidelines" className="rounded-full" />
+          </div>
+        );
+    }
+  };
+  
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Exam Preparation</h1>
         <p className="text-muted-foreground">Create, preview, and share exam papers.</p>
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 w-full max-w-md">
-          <TabsTrigger value="create">Create</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="share">Share</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid grid-cols-5 w-full max-w-4xl rounded-full p-1 bg-gray-100">
+          <TabsTrigger value="create" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">Manual Create</TabsTrigger>
+          <TabsTrigger value="syllabus" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">Syllabus Based</TabsTrigger>
+          <TabsTrigger value="preview" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">Preview</TabsTrigger>
+          <TabsTrigger value="syllabusPreview" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">Syllabus Preview</TabsTrigger>
+          <TabsTrigger value="share" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">Share</TabsTrigger>
         </TabsList>
         
+        {/* Manual Exam Creation Tab */}
         <TabsContent value="create" className="space-y-6">
-          <Card>
-            <CardHeader>
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <CardTitle>Exam Details</CardTitle>
               <CardDescription>Enter the basic information about your exam.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <CardContent className="space-y-6 p-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="exam-title">Exam Title</Label>
                   <Input 
@@ -187,16 +322,17 @@ const ExamPreparation = () => {
                     value={examTitle} 
                     onChange={(e) => setExamTitle(e.target.value)} 
                     placeholder="e.g., Mid-Term Mathematics Exam" 
+                    className="rounded-full"
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
                   <Select value={subject} onValueChange={setSubject}>
-                    <SelectTrigger id="subject">
+                    <SelectTrigger id="subject" className="rounded-full">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl">
                       {subjects.map(subject => (
                         <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
                       ))}
@@ -207,10 +343,10 @@ const ExamPreparation = () => {
                 <div className="space-y-2">
                   <Label htmlFor="grade">Grade</Label>
                   <Select value={grade} onValueChange={setGrade}>
-                    <SelectTrigger id="grade">
+                    <SelectTrigger id="grade" className="rounded-full">
                       <SelectValue placeholder="Select a grade" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl">
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((gradeNum) => (
                         <SelectItem key={gradeNum} value={gradeNum.toString()}>
                           Grade {gradeNum}
@@ -229,23 +365,24 @@ const ExamPreparation = () => {
                     type="number" 
                     min="15" 
                     max="180" 
+                    className="rounded-full"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <CardTitle>Difficulty Distribution</CardTitle>
               <CardDescription>Set the percentage of questions at each difficulty level.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
+            <CardContent className="space-y-6 p-6">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label>Easy</Label>
-                    <span className="text-sm text-muted-foreground">{difficultyDistribution.easy}%</span>
+                    <span className="text-sm font-medium text-inlustro-purple">{difficultyDistribution.easy}%</span>
                   </div>
                   <Slider
                     value={[difficultyDistribution.easy]}
@@ -253,13 +390,14 @@ const ExamPreparation = () => {
                     min={0}
                     max={100}
                     step={5}
+                    className="py-2"
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label>Medium</Label>
-                    <span className="text-sm text-muted-foreground">{difficultyDistribution.medium}%</span>
+                    <span className="text-sm font-medium text-inlustro-purple">{difficultyDistribution.medium}%</span>
                   </div>
                   <Slider
                     value={[difficultyDistribution.medium]}
@@ -267,13 +405,14 @@ const ExamPreparation = () => {
                     min={0}
                     max={100}
                     step={5}
+                    className="py-2"
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label>Hard</Label>
-                    <span className="text-sm text-muted-foreground">{difficultyDistribution.hard}%</span>
+                    <span className="text-sm font-medium text-inlustro-purple">{difficultyDistribution.hard}%</span>
                   </div>
                   <Slider
                     value={[difficultyDistribution.hard]}
@@ -281,28 +420,29 @@ const ExamPreparation = () => {
                     min={0}
                     max={100}
                     step={5}
+                    className="py-2"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <CardTitle>Questions</CardTitle>
               <CardDescription>Add questions to your exam.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 p-6">
               <div className="space-y-4">
                 {questions.map((question) => (
                   <div 
                     key={question.id} 
-                    className="p-4 border rounded-md flex flex-col space-y-2"
+                    className="p-4 border rounded-xl flex flex-col space-y-2 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Question {question.id}</span>
                       <span 
-                        className={`text-xs px-2 py-1 rounded-full ${
+                        className={`text-xs px-3 py-1 rounded-full ${
                           question.difficulty === 'easy' 
                             ? 'bg-green-100 text-green-800' 
                             : question.difficulty === 'medium'
@@ -326,7 +466,7 @@ const ExamPreparation = () => {
                     value={newQuestion}
                     onChange={(e) => setNewQuestion(e.target.value)}
                     placeholder="Enter your question here..."
-                    className="min-h-[100px]"
+                    className="min-h-[100px] rounded-xl"
                   />
                 </div>
                 
@@ -337,10 +477,10 @@ const ExamPreparation = () => {
                       value={newQuestionDifficulty} 
                       onValueChange={setNewQuestionDifficulty}
                     >
-                      <SelectTrigger id="difficulty" className="w-[180px]">
+                      <SelectTrigger id="difficulty" className="w-[180px] rounded-full">
                         <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-xl">
                         <SelectItem value="easy">Easy</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="hard">Hard</SelectItem>
@@ -348,34 +488,154 @@ const ExamPreparation = () => {
                     </Select>
                   </div>
                   
-                  <Button onClick={addQuestion}>Add Question</Button>
+                  <Button 
+                    onClick={addQuestion} 
+                    className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+                  >
+                    Add Question
+                  </Button>
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleCreateExam} className="ml-auto">Create Exam</Button>
+            <CardFooter className="p-6 pt-0">
+              <Button 
+                onClick={handleCreateExam} 
+                className="ml-auto rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+              >
+                Create Exam
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
         
+        {/* Syllabus-Based Exam Creation Tab */}
+        <TabsContent value="syllabus" className="space-y-6">
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <CardTitle>Upload Syllabus Document</CardTitle>
+              <CardDescription>Upload your curriculum or syllabus to auto-generate relevant exam questions.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="syllabus-subject">Subject</Label>
+                    <Select value={syllabusSubject} onValueChange={setSyllabusSubject}>
+                      <SelectTrigger id="syllabus-subject" className="rounded-full">
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {subjects.map(subject => (
+                          <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="syllabus-grade">Grade</Label>
+                    <Select value={syllabusGrade} onValueChange={setSyllabusGrade}>
+                      <SelectTrigger id="syllabus-grade" className="rounded-full">
+                        <SelectValue placeholder="Select a grade" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((gradeNum) => (
+                          <SelectItem key={gradeNum} value={gradeNum.toString()}>
+                            Grade {gradeNum}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col justify-center items-center p-8 border-2 border-dashed rounded-3xl bg-gray-50 border-gray-200 h-full">
+                  <div className="text-center space-y-4">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center">
+                      <Upload className="w-6 h-6 text-inlustro-purple" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-medium">Upload your document</h3>
+                      <p className="text-sm text-muted-foreground">PDF, DOCX or TXT up to 10MB</p>
+                    </div>
+                    <div className="relative">
+                      <Input 
+                        type="file" 
+                        id="file-upload" 
+                        className="sr-only"
+                        accept=".pdf,.docx,.txt"
+                        onChange={handleFileUpload}
+                      />
+                      <Label 
+                        htmlFor="file-upload" 
+                        className="cursor-pointer inline-flex items-center gap-2 rounded-full bg-inlustro-purple px-4 py-2 text-sm font-medium text-white hover:bg-inlustro-purple/90 focus:outline-none"
+                      >
+                        <FileUp className="h-4 w-4" />
+                        Choose file
+                      </Label>
+                    </div>
+                    {uploadedFileName && (
+                      <div className="flex items-center gap-2 text-sm font-medium text-inlustro-purple">
+                        <FileText className="h-4 w-4" />
+                        {uploadedFileName}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {isGenerating ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Generating questions...</span>
+                    <span>{generationProgress}%</span>
+                  </div>
+                  <Progress value={generationProgress} className="h-2" />
+                </div>
+              ) : (
+                <div className="flex justify-end">
+                  <Button 
+                    onClick={simulateGeneration}
+                    className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+                    disabled={!uploadedFile || !syllabusSubject || !syllabusGrade}
+                  >
+                    Generate Questions
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Manual Preview Tab */}
         <TabsContent value="preview" className="space-y-6">
-          <Card className="flex flex-col">
-            <CardHeader>
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <div className="flex items-center justify-between">
                 <CardTitle>Exam Preview</CardTitle>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon" onClick={handleDownload}>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handleDownload} 
+                    className="rounded-full h-10 w-10"
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="icon" onClick={handleShare}>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handleShare}
+                    className="rounded-full h-10 w-10"
+                  >
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
               <CardDescription>Preview how your exam will appear to students.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="border rounded-md p-6 space-y-6 bg-white">
+            <CardContent className="p-6">
+              <div className="border rounded-2xl p-6 space-y-8 bg-white shadow-sm">
                 <div className="text-center space-y-2">
                   <h2 className="text-2xl font-bold">
                     {examTitle || "Exam Title"}
@@ -394,13 +654,13 @@ const ExamPreparation = () => {
                   </p>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {questions.map((question, index) => (
-                    <div key={question.id} className="space-y-2">
+                    <div key={question.id} className="space-y-4">
                       <div className="flex justify-between items-center">
                         <h4 className="font-medium">Question {index + 1}</h4>
                         <span 
-                          className={`text-xs px-2 py-0.5 rounded-full ${
+                          className={`text-xs px-3 py-1 rounded-full ${
                             question.difficulty === 'easy' 
                               ? 'bg-green-100 text-green-800' 
                               : question.difficulty === 'medium'
@@ -412,7 +672,7 @@ const ExamPreparation = () => {
                         </span>
                       </div>
                       <p className="text-sm">{question.text}</p>
-                      <div className="h-8 border-b border-dotted" />
+                      <div className="h-10 border-b border-dotted" />
                     </div>
                   ))}
                 </div>
@@ -421,34 +681,124 @@ const ExamPreparation = () => {
           </Card>
         </TabsContent>
         
+        {/* Syllabus Preview Tab */}
+        <TabsContent value="syllabusPreview" className="space-y-6">
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <div className="flex items-center justify-between">
+                <CardTitle>Generated Exam Preview</CardTitle>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handleDownload}
+                    className="rounded-full h-10 w-10"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={handleShare}
+                    className="rounded-full h-10 w-10"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <CardDescription>
+                AI-generated questions based on your syllabus. You can edit these questions before finalizing.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="border rounded-2xl p-6 space-y-6 bg-white shadow-sm">
+                <div className="text-center space-y-2">
+                  <h2 className="text-2xl font-bold">
+                    {subjects.find(s => s.id === syllabusSubject)?.name || "Subject"} Exam
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Grade {syllabusGrade || "X"} - Based on {uploadedFileName || "uploaded syllabus"}
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
+                  {generatedQuestions.map((question, index) => (
+                    <div key={question.id} className="border rounded-xl p-4 space-y-4 bg-gray-50">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-inlustro-purple text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium">
+                            {index + 1}
+                          </span>
+                          <h4 className="font-medium">
+                            {question.text}
+                          </h4>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-inlustro-purple hover:text-inlustro-purple/80">
+                          <Edit2 className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                      </div>
+                      
+                      <div className="pl-8 space-y-3">
+                        <div className="text-xs uppercase tracking-wide text-gray-500 font-medium">
+                          {question.type === 'mcq' ? 'Multiple Choice' : 
+                            question.type === 'essay' ? 'Essay Question' :
+                            question.type === 'problem' ? 'Problem Solving' :
+                            question.type === 'true_false' ? 'True/False' :
+                            'Short Answer'}
+                        </div>
+                        
+                        {renderQuestionEditForm(question, index)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex justify-between items-center pt-6">
+                  <Button variant="outline" className="rounded-full" onClick={() => setActiveTab('syllabus')}>
+                    Go Back
+                  </Button>
+                  <Button className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
+                    Finalize Exam
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Share Tab */}
         <TabsContent value="share" className="space-y-6">
-          <Card>
-            <CardHeader>
+          <Card className="rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <CardTitle>Share Exam</CardTitle>
               <CardDescription>Share your exam with students or classes.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="space-y-6 p-6">
+              <div className="space-y-4">
                 <Label>Exam Link</Label>
                 <div className="flex">
-                  <Input value="https://inlustro.edu/exams/math-midterm-2025" readOnly />
-                  <Button className="ml-2">Copy</Button>
+                  <Input 
+                    value="https://inlustro.edu/exams/math-midterm-2025" 
+                    readOnly 
+                    className="rounded-l-full" 
+                  />
+                  <Button className="rounded-r-full bg-inlustro-purple hover:bg-inlustro-purple/90">Copy</Button>
                 </div>
               </div>
               
-              <div className="space-y-2 pt-4">
+              <div className="space-y-4 pt-6">
                 <Label>Share with Class</Label>
                 <Select>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-full">
                     <SelectValue placeholder="Select a class" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl">
                     <SelectItem value="class-10a">Class 10A</SelectItem>
                     <SelectItem value="class-10b">Class 10B</SelectItem>
                     <SelectItem value="class-10c">Class 10C</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button className="mt-2">Share with Class</Button>
+                <Button className="mt-2 rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">Share with Class</Button>
               </div>
             </CardContent>
           </Card>

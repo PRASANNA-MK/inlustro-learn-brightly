@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 220 33% 98%; /* Light blue background from image */
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 199 85% 57%; /* InLustro Blue */
+    --primary: 247 64% 61%; /* Based on the purple in the image */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 53 92% 67%; /* InLustro Yellow */
+    --secondary: 183 74% 44%; /* Turquoise from image */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 141 31% 53%; /* Mint green from image */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,18 +31,18 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 199 85% 57%;
+    --ring: 247 64% 61%;
 
-    --radius: 0.75rem;
+    --radius: 1.5rem; /* Increased border radius for rounder components */
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 199 85% 57%; 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-background: 247 64% 61%; /* Purple sidebar */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 247 64% 61%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 199 85% 57%;
+    --sidebar-border: 247 64% 70%;
+    --sidebar-ring: 247 64% 61%;
   }
 
   .dark {
@@ -55,16 +55,16 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 199 85% 57%;
+    --primary: 247 64% 61%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 53 92% 67%;
+    --secondary: 183 74% 44%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 141 31% 53%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -97,11 +97,11 @@
 }
 
 .badge-primary {
-  @apply bg-inlustro-blue text-white shadow hover:bg-inlustro-blue/80;
+  @apply bg-inlustro-purple text-white shadow hover:bg-inlustro-purple/80;
 }
 
 .badge-secondary {
-  @apply bg-inlustro-yellow text-foreground shadow hover:bg-inlustro-yellow/80;
+  @apply bg-inlustro-mint text-foreground shadow hover:bg-inlustro-mint/80;
 }
 
 .badge-outline {
@@ -113,13 +113,34 @@
 }
 
 .progress-bar-value {
-  @apply h-full rounded-full bg-inlustro-blue transition-all;
+  @apply h-full rounded-full bg-inlustro-purple transition-all;
 }
 
 .lesson-card {
-  @apply relative overflow-hidden rounded-lg border bg-card p-5 shadow-sm transition-all hover:shadow-md;
+  @apply relative overflow-hidden rounded-3xl border bg-card p-5 shadow-inlustro transition-all hover:shadow-lg;
 }
 
 .stats-card {
-  @apply flex flex-col space-y-1.5 rounded-lg border bg-card p-6 shadow-sm;
+  @apply flex flex-col space-y-1.5 rounded-3xl border bg-card p-6 shadow-inlustro;
+}
+
+/* New styles for modern UI */
+.inlustro-container {
+  @apply mx-auto w-full max-w-7xl px-4;
+}
+
+.inlustro-card {
+  @apply rounded-3xl bg-white shadow-inlustro border-0 overflow-hidden;
+}
+
+.inlustro-button-primary {
+  @apply bg-inlustro-purple text-white rounded-full px-6 py-2 font-medium hover:bg-inlustro-purple/90 transition-colors;
+}
+
+.inlustro-button-secondary {
+  @apply bg-inlustro-mint text-white rounded-full px-6 py-2 font-medium hover:bg-inlustro-mint/90 transition-colors;
+}
+
+.inlustro-input {
+  @apply rounded-full border-inlustro-gray/20 focus:border-inlustro-purple focus:ring-1 focus:ring-inlustro-purple;
 }

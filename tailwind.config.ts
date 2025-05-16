@@ -63,16 +63,27 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// InLustro custom colors
+				// New color palette from the image
 				"inlustro-blue": {
-					light: "#D3E4FD",
-					DEFAULT: "#33C3F0",
-					dark: "#1EAEDB"
+					light: "#B6CAF2", // Lighter blue from image
+					DEFAULT: "#5F65D9", // Main purple-blue from image
+					dark: "#54678C" // Darker blue-gray from image
 				},
 				"inlustro-yellow": {
 					light: "#FEF7CD",
 					DEFAULT: "#F9E559",
 					dark: "#F7DD1E"
+				},
+				"inlustro-gray": {
+					light: "#B6CAF2", // Light blue-gray
+					DEFAULT: "#54678C", // Darker slate blue
+					dark: "#333333"
+				},
+				"inlustro-purple": {
+					DEFAULT: "#5F65D9" // Purple from the image
+				},
+				"inlustro-mint": {
+					DEFAULT: "#6DA681" // Green from the image
 				}
 			},
 			borderRadius: {
@@ -101,7 +112,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+			},
+			boxShadow: {
+				'inlustro': '0 4px 20px rgba(0, 0, 0, 0.08)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
