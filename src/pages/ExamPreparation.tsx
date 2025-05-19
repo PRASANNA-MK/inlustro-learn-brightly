@@ -46,6 +46,13 @@ const ExamPreparation = () => {
   const [newQuestion, setNewQuestion] = useState('');
   const [newQuestionDifficulty, setNewQuestionDifficulty] = useState('medium');
   
+  // For question pattern
+  const [oneMarkQuestions, setOneMarkQuestions] = useState('5');
+  const [twoMarkQuestions, setTwoMarkQuestions] = useState('5');
+  const [fiveMarkQuestions, setFiveMarkQuestions] = useState('3');
+  const [sevenMarkQuestions, setSevenMarkQuestions] = useState('2');
+  const [tenMarkQuestions, setTenMarkQuestions] = useState('1');
+  
   // For syllabus-based creation
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState('');
@@ -54,6 +61,13 @@ const ExamPreparation = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
+  
+  // For syllabus-based question pattern
+  const [syllabusOneMarkQuestions, setSyllabusOneMarkQuestions] = useState('5');
+  const [syllabusTwoMarkQuestions, setSyllabusTwoMarkQuestions] = useState('5');
+  const [syllabusFiveMarkQuestions, setSyllabusFiveMarkQuestions] = useState('3');
+  const [syllabusSevenMarkQuestions, setSyllabusSevenMarkQuestions] = useState('2');
+  const [syllabusTenMarkQuestions, setSyllabusTenMarkQuestions] = useState('1');
   
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -200,6 +214,13 @@ const ExamPreparation = () => {
     setActiveTab('preview');
   };
   
+  const handleSavePattern = (isManual: boolean) => {
+    toast({
+      title: "Pattern Saved",
+      description: "Your exam pattern has been saved successfully.",
+    });
+  };
+  
   const handleDownload = () => {
     toast({
       title: "Downloading Exam",
@@ -288,6 +309,133 @@ const ExamPreparation = () => {
           </div>
         );
     }
+  };
+  
+  // Question pattern component for reuse
+  const QuestionPatternSection = ({ 
+    oneMarkValue,
+    setOneMarkValue,
+    twoMarkValue,
+    setTwoMarkValue,
+    fiveMarkValue,
+    setFiveMarkValue,
+    sevenMarkValue,
+    setSevenMarkValue,
+    tenMarkValue,
+    setTenMarkValue,
+    onSave,
+  }: {
+    oneMarkValue: string;
+    setOneMarkValue: (value: string) => void;
+    twoMarkValue: string;
+    setTwoMarkValue: (value: string) => void;
+    fiveMarkValue: string;
+    setFiveMarkValue: (value: string) => void;
+    sevenMarkValue: string;
+    setSevenMarkValue: (value: string) => void;
+    tenMarkValue: string;
+    setTenMarkValue: (value: string) => void;
+    onSave: () => void;
+  }) => {
+    // Calculate estimated total
+    const estimatedTotal = 
+      parseInt(oneMarkValue || '0') * 1 + 
+      parseInt(twoMarkValue || '0') * 2 + 
+      parseInt(fiveMarkValue || '0') * 5 + 
+      parseInt(sevenMarkValue || '0') * 7 + 
+      parseInt(tenMarkValue || '0') * 10;
+    
+    const totalQuestions = 
+      parseInt(oneMarkValue || '0') + 
+      parseInt(twoMarkValue || '0') + 
+      parseInt(fiveMarkValue || '0') + 
+      parseInt(sevenMarkValue || '0') + 
+      parseInt(tenMarkValue || '0');
+    
+    return (
+      <Card className="rounded-3xl shadow-inlustro border-0">
+        <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+          <CardTitle>Set Exam Pattern</CardTitle>
+          <CardDescription>Define the number of questions for each mark category.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="one-mark">1-Mark Questions</Label>
+              <Input
+                id="one-mark"
+                type="number"
+                min="0"
+                value={oneMarkValue}
+                onChange={(e) => setOneMarkValue(e.target.value)}
+                className="rounded-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="two-mark">2-Mark Questions</Label>
+              <Input
+                id="two-mark"
+                type="number"
+                min="0"
+                value={twoMarkValue}
+                onChange={(e) => setTwoMarkValue(e.target.value)}
+                className="rounded-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="five-mark">5-Mark Questions</Label>
+              <Input
+                id="five-mark"
+                type="number"
+                min="0"
+                value={fiveMarkValue}
+                onChange={(e) => setFiveMarkValue(e.target.value)}
+                className="rounded-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="seven-mark">7-Mark Questions</Label>
+              <Input
+                id="seven-mark"
+                type="number"
+                min="0"
+                value={sevenMarkValue}
+                onChange={(e) => setSevenMarkValue(e.target.value)}
+                className="rounded-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="ten-mark">10/15-Mark Questions</Label>
+              <Input
+                id="ten-mark"
+                type="number"
+                min="0"
+                value={tenMarkValue}
+                onChange={(e) => setTenMarkValue(e.target.value)}
+                className="rounded-full"
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center justify-between mt-6 pt-4 border-t">
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Total Questions: <span className="font-medium text-inlustro-purple">{totalQuestions}</span></p>
+              <p className="text-sm text-muted-foreground">Estimated Total Marks: <span className="font-medium text-inlustro-purple">{estimatedTotal}</span></p>
+            </div>
+            <Button 
+              onClick={onSave}
+              className="ml-auto mt-2 rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+            >
+              Save Pattern
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
   
   return (
@@ -497,15 +645,31 @@ const ExamPreparation = () => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="p-6 pt-0">
-              <Button 
-                onClick={handleCreateExam} 
-                className="ml-auto rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
-              >
-                Create Exam
-              </Button>
-            </CardFooter>
           </Card>
+          
+          {/* Question Pattern Section for Manual Create */}
+          <QuestionPatternSection 
+            oneMarkValue={oneMarkQuestions}
+            setOneMarkValue={setOneMarkQuestions}
+            twoMarkValue={twoMarkQuestions}
+            setTwoMarkValue={setTwoMarkQuestions}
+            fiveMarkValue={fiveMarkQuestions}
+            setFiveMarkValue={setFiveMarkQuestions}
+            sevenMarkValue={sevenMarkQuestions}
+            setSevenMarkValue={setSevenMarkQuestions}
+            tenMarkValue={tenMarkQuestions}
+            setTenMarkValue={setTenMarkQuestions}
+            onSave={() => handleSavePattern(true)}
+          />
+          
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleCreateExam} 
+              className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+            >
+              Create Exam
+            </Button>
+          </div>
         </TabsContent>
         
         {/* Syllabus-Based Exam Creation Tab */}
@@ -583,28 +747,44 @@ const ExamPreparation = () => {
                   </div>
                 </div>
               </div>
-              
-              {isGenerating ? (
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span>Generating questions...</span>
-                    <span>{generationProgress}%</span>
-                  </div>
-                  <Progress value={generationProgress} className="h-2" />
-                </div>
-              ) : (
-                <div className="flex justify-end">
-                  <Button 
-                    onClick={simulateGeneration}
-                    className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
-                    disabled={!uploadedFile || !syllabusSubject || !syllabusGrade}
-                  >
-                    Generate Questions
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
+          
+          {uploadedFile && syllabusSubject && syllabusGrade && !isGenerating && (
+            <QuestionPatternSection 
+              oneMarkValue={syllabusOneMarkQuestions}
+              setOneMarkValue={setSyllabusOneMarkQuestions}
+              twoMarkValue={syllabusTwoMarkQuestions}
+              setTwoMarkValue={setSyllabusTwoMarkQuestions}
+              fiveMarkValue={syllabusFiveMarkQuestions}
+              setFiveMarkValue={setSyllabusFiveMarkQuestions}
+              sevenMarkValue={syllabusSevenMarkQuestions}
+              setSevenMarkValue={setSyllabusSevenMarkQuestions}
+              tenMarkValue={syllabusTenMarkQuestions}
+              setTenMarkValue={setSyllabusTenMarkQuestions}
+              onSave={() => handleSavePattern(false)}
+            />
+          )}
+          
+          {isGenerating ? (
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm font-medium">
+                <span>Generating questions...</span>
+                <span>{generationProgress}%</span>
+              </div>
+              <Progress value={generationProgress} className="h-2" />
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <Button 
+                onClick={simulateGeneration}
+                className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
+                disabled={!uploadedFile || !syllabusSubject || !syllabusGrade}
+              >
+                Generate Questions
+              </Button>
+            </div>
+          )}
         </TabsContent>
         
         {/* Manual Preview Tab */}
