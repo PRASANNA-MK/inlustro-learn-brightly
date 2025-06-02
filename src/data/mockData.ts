@@ -12,11 +12,22 @@ export const currentUser = {
   classes: ['10A', '10B', '10C'],
   employeeId: 'T001',
   joinedDate: '2021-08-15',
+  xp: 2850,
+  level: 12,
   preferences: {
     theme: 'light',
     notificationsEnabled: true,
   },
 };
+
+export const subjects = [
+  { id: 'math', name: 'Mathematics' },
+  { id: 'science', name: 'Science' },
+  { id: 'english', name: 'English' },
+  { id: 'history', name: 'History' },
+  { id: 'physics', name: 'Physics' },
+  { id: 'chemistry', name: 'Chemistry' },
+];
 
 export const weeklyActivity = [
   { day: 'Mon', lessons: 3, submissions: 12 },
@@ -95,7 +106,7 @@ export const lessons = [
   {
     id: 'lesson-1',
     title: 'Introduction to Quadratic Equations',
-    subject: 'Mathematics',
+    subject: 'math',
     grade: '10th Grade',
     class: '10A',
     description: 'Understanding the basics of quadratic equations and their applications',
@@ -104,6 +115,7 @@ export const lessons = [
     completedDate: '2024-05-28T10:00:00Z',
     studentsCompleted: 28,
     totalStudents: 30,
+    content: '<h2>Introduction to Quadratic Equations</h2><p>A quadratic equation is a polynomial equation of degree 2...</p>',
     resources: [
       { type: 'document', title: 'Quadratic Equations Worksheet', url: '/resources/quadratic-worksheet.pdf' },
       { type: 'video', title: 'Introduction Video', url: 'https://example.com/quadratic-intro' },
@@ -112,7 +124,7 @@ export const lessons = [
   {
     id: 'lesson-2',
     title: 'Solving Quadratic Equations',
-    subject: 'Mathematics',
+    subject: 'math',
     grade: '10th Grade',
     class: '10A',
     description: 'Different methods to solve quadratic equations',
@@ -121,6 +133,7 @@ export const lessons = [
     scheduledDate: '2024-06-03T10:00:00Z',
     studentsCompleted: 15,
     totalStudents: 30,
+    content: '<h2>Solving Quadratic Equations</h2><p>There are several methods to solve quadratic equations...</p>',
     resources: [
       { type: 'document', title: 'Solving Methods Guide', url: '/resources/solving-methods.pdf' },
     ],
@@ -128,18 +141,21 @@ export const lessons = [
   {
     id: 'lesson-3',
     title: 'Graphing Quadratic Functions',
-    subject: 'Mathematics',
+    subject: 'math',
     grade: '10th Grade',
     class: '10B',
     description: 'Visual representation of quadratic functions',
     duration: 45,
-    status: 'Pending',
+    status: 'Not Started',
     scheduledDate: '2024-06-05T11:00:00Z',
     studentsCompleted: 0,
     totalStudents: 28,
+    content: '<h2>Graphing Quadratic Functions</h2><p>Learn to graph quadratic functions and understand their properties...</p>',
     resources: [],
   },
 ];
+
+export type Lesson = typeof lessons[0];
 
 export const submissions = [
   {
@@ -186,6 +202,125 @@ export const submissions = [
     pendingReview: 0,
     averageScore: 85,
     status: 'Completed',
+  },
+];
+
+export const quizzes = [
+  {
+    id: 'quiz-1',
+    title: 'Algebra Basics Quiz',
+    subject: 'math',
+    description: 'Test your understanding of basic algebraic concepts',
+    totalQuestions: 15,
+    timeLimit: 30,
+    completed: true,
+    score: 85,
+    difficultyBreakdown: {
+      easy: 60,
+      medium: 30,
+      hard: 10,
+    },
+    questions: [
+      {
+        id: 'q1',
+        text: 'Solve for x: 2x + 5 = 11',
+        difficulty: 'easy',
+        points: 2,
+      },
+      {
+        id: 'q2',
+        text: 'Factor the expression: x² - 9',
+        difficulty: 'medium',
+        points: 3,
+      },
+    ],
+  },
+  {
+    id: 'quiz-2',
+    title: 'Quadratic Equations Quiz',
+    subject: 'math',
+    description: 'Advanced quiz on quadratic equations',
+    totalQuestions: 20,
+    timeLimit: 45,
+    completed: false,
+    score: undefined,
+    difficultyBreakdown: {
+      easy: 20,
+      medium: 50,
+      hard: 30,
+    },
+    questions: [
+      {
+        id: 'q3',
+        text: 'Solve using the quadratic formula: x² + 3x - 4 = 0',
+        difficulty: 'hard',
+        points: 5,
+      },
+    ],
+  },
+];
+
+export type Quiz = typeof quizzes[0];
+
+export const badges = [
+  {
+    id: 'badge-1',
+    title: 'First Lesson',
+    description: 'Complete your first lesson',
+    imageUrl: '/badges/first-lesson.png',
+    earned: true,
+    earnedDate: '2024-05-15T10:00:00Z',
+  },
+  {
+    id: 'badge-2',
+    title: 'Quiz Master',
+    description: 'Score 90% or higher on 5 quizzes',
+    imageUrl: '/badges/quiz-master.png',
+    earned: true,
+    earnedDate: '2024-05-20T14:30:00Z',
+  },
+  {
+    id: 'badge-3',
+    title: 'Streak Runner',
+    description: 'Log in for 7 consecutive days',
+    imageUrl: '/badges/streak-runner.png',
+    earned: false,
+    earnedDate: null,
+  },
+];
+
+export const leaderboard = [
+  {
+    id: 'student-2',
+    name: 'Emma Davis',
+    class: '10A',
+    xp: 3200,
+    level: 15,
+    avatar: '/avatars/emma.png',
+  },
+  {
+    id: 'teacher-1',
+    name: 'Sarah Johnson',
+    class: 'Teacher',
+    xp: 2850,
+    level: 12,
+    avatar: '/avatars/teacher-sarah.png',
+  },
+  {
+    id: 'student-4',
+    name: 'Sophie Wilson',
+    class: '10B',
+    xp: 2650,
+    level: 11,
+    avatar: '/avatars/sophie.png',
+  },
+  {
+    id: 'student-1',
+    name: 'Alex Thompson',
+    class: '10A',
+    xp: 2400,
+    level: 10,
+    avatar: '/avatars/alex.png',
   },
 ];
 

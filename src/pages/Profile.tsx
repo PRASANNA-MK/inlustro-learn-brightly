@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -104,8 +105,8 @@ const Profile = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label htmlFor="class" className="text-sm font-medium">Class</label>
-                    <Input id="class" value={user.class || ''} onChange={e => setUser({...user, class: e.target.value})} />
+                    <label htmlFor="subject" className="text-sm font-medium">Subject</label>
+                    <Input id="subject" value={user.subject} onChange={e => setUser({...user, subject: e.target.value})} />
                   </div>
                 </div>
                 

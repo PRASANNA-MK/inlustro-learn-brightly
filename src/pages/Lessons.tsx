@@ -25,13 +25,11 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, AlertCircle, Headphones, BookOpen, GraduationCap } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, BookOpen } from 'lucide-react';
 import { subjects, lessons as allLessons, Lesson } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 const Lessons = () => {
-  const navigate = useNavigate();
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
@@ -91,11 +89,6 @@ const Lessons = () => {
         description: "Your progress has been updated.",
       });
     }
-  };
-
-  const openAITutor = (lesson: Lesson) => {
-    // In a real app, this would navigate to the AI Tutor with the specific lesson ID
-    navigate('/ai-tutor', { state: { lessonId: lesson.id } });
   };
 
   return (
@@ -162,32 +155,17 @@ const Lessons = () => {
                     <Clock className="h-3 w-3" />
                     {lesson.duration} minutes
                   </Badge>
-                  {lesson.hasVoiceTutor && (
-                    <Badge variant="outline" className="flex items-center gap-1 bg-inlustro-blue-light text-inlustro-blue-dark">
-                      <Headphones className="h-3 w-3" />
-                      AI Voice Tutor
-                    </Badge>
-                  )}
                 </div>
               </CardContent>
-              <CardFooter className="grid grid-cols-2 gap-2 pt-0">
+              <CardFooter className="pt-0">
                 <Button 
                   variant="outline"
                   onClick={() => setSelectedLesson(lesson)}
+                  className="w-full"
                 >
                   <BookOpen className="mr-1 h-4 w-4" />
                   View Lesson
                 </Button>
-                {lesson.hasVoiceTutor && (
-                  <Button 
-                    variant="default"
-                    onClick={() => openAITutor(lesson)}
-                    className="bg-gradient-to-r from-inlustro-blue to-inlustro-blue-dark"
-                  >
-                    <Headphones className="mr-1 h-4 w-4" />
-                    AI Tutor
-                  </Button>
-                )}
               </CardFooter>
             </Card>
           ))}
@@ -213,28 +191,6 @@ const Lessons = () => {
             </DialogHeader>
             
             <div className="mt-4 space-y-4">
-              {selectedLesson.hasVoiceTutor && (
-                <Card className="bg-inlustro-blue-light/20 border-inlustro-blue">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="h-5 w-5 text-inlustro-blue" />
-                      <span className="font-medium">This lesson has an interactive AI Voice Tutor</span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedLesson(null);
-                        openAITutor(selectedLesson);
-                      }}
-                    >
-                      <Headphones className="mr-1 h-4 w-4" />
-                      Start Voice Lesson
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-              
               <div dangerouslySetInnerHTML={{ __html: selectedLesson.content }} />
             </div>
             
