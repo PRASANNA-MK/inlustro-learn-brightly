@@ -2,28 +2,25 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { currentUser, weeklyActivity } from '@/data/mockData';
+import { currentUser, weeklyActivity, lessons, submissions, students } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
-import { FileText, Users, ClipboardEdit, Calendar, Clock, CheckCircle2 } from 'lucide-react';
+import { Book, Users, ClipboardEdit, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
-// Sample data
-const upcomingExams = [
-  { id: 'e1', title: 'Mid-Term Mathematics', date: '2025-06-10', subject: 'Mathematics', class: '10A', status: 'scheduled' },
-  { id: 'e2', title: 'Science Quiz', date: '2025-06-05', subject: 'Science', class: '9B', status: 'scheduled' },
-  { id: 'e3', title: 'English Literature', date: '2025-06-15', subject: 'English', class: '11A', status: 'draft' },
-];
-
-const topStudents = [
-  { id: 's1', name: 'Alex Johnson', class: '10A', score: 95, avatar: '/avatars/alex.png' },
-  { id: 's2', name: 'Sam Williams', class: '10A', score: 92, avatar: '/avatars/sam.png' },
-  { id: 's3', name: 'Jordan Smith', class: '10C', score: 90, avatar: '/avatars/jordan.png' },
-];
-
 const Dashboard = () => {
+  const completedLessons = lessons.filter(lesson => lesson.status === 'Completed').length;
+  const pendingSubmissions = submissions.reduce((acc, sub) => acc + sub.pendingReview, 0);
+  const totalStudents = students.length;
+  const activeClasses = currentUser.classes.length;
+
+  const upcomingTasks = [
+    { id: 1, title: 'Grade Quadratic Equations Homework', type: 'Review', dueDate: '2024-06-03', priority: 'High' },
+    { id: 2, title: 'Prepare Lesson: Graphing Functions', type: 'Lesson Prep', dueDate: '2024-06-04', priority: 'Medium' },
+    { id: 3, title: 'Parent Meeting - Emma Davis', type: 'Meeting', dueDate: '2024-06-05', priority: 'Low' },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4">
@@ -31,126 +28,156 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold tracking-tight">Welcome back, {currentUser.name}!</h1>
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-inlustro-purple/10 text-inlustro-purple">
-              {currentUser.role === 'admin' ? 'Administrator' : 'Teacher'}
+              {currentUser.subject} Teacher
             </Badge>
           </div>
         </div>
         <p className="text-muted-foreground">
-          {currentUser.role === 'admin' ? 'Manage your school and teachers.' : 'Prepare exams and view student submissions.'}
+          Teaching {currentUser.grade} • Classes: {currentUser.classes.join(', ')}
         </p>
       </div>
       
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="pb-2 bg-gradient-to-r from-blue-500/10 to-transparent rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <Users className="h-6 w-6 text-blue-500" />
+              </div>
+              <span className="text-2xl font-bold">{totalStudents}</span>
+            </div>
+            <CardTitle className="text-base">Total Students</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Across {activeClasses} classes</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="pb-2 bg-gradient-to-r from-green-500/10 to-transparent rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-green-500" />
+              </div>
+              <span className="text-2xl font-bold">{completedLessons}</span>
+            </div>
+            <CardTitle className="text-base">Lessons Completed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">This week</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="pb-2 bg-gradient-to-r from-orange-500/10 to-transparent rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center">
+                <ClipboardEdit className="h-6 w-6 text-orange-500" />
+              </div>
+              <span className="text-2xl font-bold">{pendingSubmissions}</span>
+            </div>
+            <CardTitle className="text-base">Pending Reviews</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">Need grading</p>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="pb-2 bg-gradient-to-r from-purple-500/10 to-transparent rounded-t-3xl">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <Book className="h-6 w-6 text-purple-500" />
+              </div>
+              <span className="text-2xl font-bold">{activeClasses}</span>
+            </div>
+            <CardTitle className="text-base">Active Classes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">This semester</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link to="/exam-preparation" className="block">
+        <Link to="/lesson-manager" className="block">
           <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
             <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
-                <FileText className="h-6 w-6 text-inlustro-purple" />
+                <Book className="h-6 w-6 text-inlustro-purple" />
               </div>
-              <CardTitle className="mt-2">Create Exam</CardTitle>
-              <CardDescription>Create and manage exam papers</CardDescription>
+              <CardTitle className="mt-2">Manage Lessons</CardTitle>
+              <CardDescription>Create and organize lesson plans</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Create custom exams with different difficulty levels and share with students.
+                Add new lessons, upload resources, and track student progress.
               </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm font-medium">Recent exams: <span className="text-inlustro-purple">12</span></span>
-                <Button className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">Get Started</Button>
+              <div className="mt-4">
+                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
+                  Go to Lessons
+                </Button>
               </div>
             </CardContent>
           </Card>
         </Link>
-        
-        <Link to="/teachers" className="block">
-          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-inlustro-purple" />
-              </div>
-              <CardTitle className="mt-2">Manage Teachers</CardTitle>
-              <CardDescription>View and manage teacher accounts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View teacher profiles, manage permissions, and assign classes.
-              </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm font-medium">Active teachers: <span className="text-inlustro-purple">18</span></span>
-                <Button className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">View Teachers</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        
+
         <Link to="/submissions" className="block">
           <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
             <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
               <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
                 <ClipboardEdit className="h-6 w-6 text-inlustro-purple" />
               </div>
-              <CardTitle className="mt-2">View Submissions</CardTitle>
-              <CardDescription>Track student submissions</CardDescription>
+              <CardTitle className="mt-2">Review Submissions</CardTitle>
+              <CardDescription>Grade assignments and homework</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                View and grade student exam submissions and track progress.
+                View student submissions and provide feedback.
               </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm font-medium">Pending grades: <span className="text-inlustro-purple">6</span></span>
-                <Button className="rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">Check Submissions</Button>
+              <div className="mt-4">
+                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
+                  Review Work
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/exam-preparation" className="block">
+          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
+            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
+                <Users className="h-6 w-6 text-inlustro-purple" />
+              </div>
+              <CardTitle className="mt-2">Prepare Exams</CardTitle>
+              <CardDescription>Create and manage examinations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Generate exams from syllabus or lesson notes.
+              </p>
+              <div className="mt-4">
+                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
+                  Create Exam
+                </Button>
               </div>
             </CardContent>
           </Card>
         </Link>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="rounded-3xl shadow-inlustro border-0 md:col-span-1">
+
+      {/* Activity Chart and Upcoming Tasks */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="rounded-3xl shadow-inlustro border-0">
           <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Upcoming Exams
+              <Clock className="h-5 w-5" />
+              Weekly Activity
             </CardTitle>
-            <CardDescription>Scheduled exams for the next 14 days</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {upcomingExams.map((exam) => (
-              <div key={exam.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{exam.title}</p>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {exam.class}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(exam.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-                </div>
-                <Badge variant={exam.status === 'scheduled' ? 'default' : 'outline'} className={exam.status === 'scheduled' ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}>
-                  {exam.status === 'scheduled' ? 'Scheduled' : 'Draft'}
-                </Badge>
-              </div>
-            ))}
-            <Button variant="outline" className="w-full mt-2 text-inlustro-purple hover:text-inlustro-purple/80 hover:bg-inlustro-purple/10">
-              View All Exams
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="h-full rounded-3xl shadow-inlustro border-0 md:col-span-2">
-          <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Weekly Activity
-              </CardTitle>
-              <Badge variant="outline" className="bg-inlustro-purple/10 text-inlustro-purple">
-                Last 7 Days
-              </Badge>
-            </div>
-            <CardDescription>Minutes spent on platform this week</CardDescription>
+            <CardDescription>Lessons taught and submissions reviewed</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -158,79 +185,81 @@ const Dashboard = () => {
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip 
-                  formatter={(value) => [`${value} min`, 'Active Time']}
+                  formatter={(value, name) => [value, name === 'lessons' ? 'Lessons' : 'Submissions']}
                   labelFormatter={(label) => `${label}`}
                 />
-                <Bar dataKey="minutes" fill="#5F65D9" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="lessons" fill="#5F65D9" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="submissions" fill="#A855F7" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="rounded-3xl shadow-inlustro border-0">
-          <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5" />
-              Recent Activities
-            </CardTitle>
-            <CardDescription>Your activities in the past week</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-              <p className="text-sm font-medium">Math Exam Created</p>
-              <p className="text-xs text-muted-foreground">2 hours ago</p>
-            </div>
-            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-              <p className="text-sm font-medium">Physics Exam Shared</p>
-              <p className="text-xs text-muted-foreground">Yesterday</p>
-            </div>
-            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-              <p className="text-sm font-medium">New Teacher Added</p>
-              <p className="text-xs text-muted-foreground">2 days ago</p>
-            </div>
-            <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-              <p className="text-sm font-medium">Student Submissions Graded</p>
-              <p className="text-xs text-muted-foreground">3 days ago</p>
-            </div>
-            <Button variant="ghost" className="w-full mt-2 text-inlustro-purple hover:text-inlustro-purple/80 hover:bg-inlustro-purple/10">
-              View All Activities
-            </Button>
           </CardContent>
         </Card>
 
         <Card className="rounded-3xl shadow-inlustro border-0">
           <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-            <CardTitle>Top Performing Students</CardTitle>
-            <CardDescription>Highest scoring students this month</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Upcoming Tasks
+            </CardTitle>
+            <CardDescription>Your schedule for the next few days</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {topStudents.map((student, index) => (
-              <div key={student.id} className="flex items-center space-x-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-inlustro-purple/10 text-sm font-medium text-inlustro-purple">
-                  {index + 1}
+          <CardContent className="space-y-4">
+            {upcomingTasks.map((task) => (
+              <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{task.title}</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      {task.type}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={student.avatar} />
-                  <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium leading-none">{student.name}</p>
-                  <p className="text-xs text-muted-foreground">Class {student.class}</p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-sm font-medium">{student.score}%</span>
-                  <Progress value={student.score} className="h-1.5 w-24" />
-                </div>
+                <Badge 
+                  variant={task.priority === 'High' ? 'destructive' : task.priority === 'Medium' ? 'default' : 'outline'}
+                  className="text-xs"
+                >
+                  {task.priority}
+                </Badge>
               </div>
             ))}
             <Button variant="ghost" className="w-full mt-2 text-inlustro-purple hover:text-inlustro-purple/80 hover:bg-inlustro-purple/10">
-              View Full Leaderboard
+              View All Tasks
             </Button>
           </CardContent>
         </Card>
       </div>
+
+      {/* Recent Activity */}
+      <Card className="rounded-3xl shadow-inlustro border-0">
+        <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5" />
+            Recent Activity
+          </CardTitle>
+          <CardDescription>Your recent teaching activities</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
+            <p className="text-sm font-medium">Completed lesson: Quadratic Equations</p>
+            <p className="text-xs text-muted-foreground">2 hours ago • Class 10A</p>
+          </div>
+          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
+            <p className="text-sm font-medium">Graded 15 homework submissions</p>
+            <p className="text-xs text-muted-foreground">Yesterday • Class 10B</p>
+          </div>
+          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
+            <p className="text-sm font-medium">Created new assignment: Algebra Practice</p>
+            <p className="text-xs text-muted-foreground">2 days ago • Class 10C</p>
+          </div>
+          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
+            <p className="text-sm font-medium">Uploaded lesson resources</p>
+            <p className="text-xs text-muted-foreground">3 days ago • Quadratic Functions</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

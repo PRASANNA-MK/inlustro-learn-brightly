@@ -6,13 +6,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import ExamPreparation from "./pages/ExamPreparation";
-import Teachers from "./pages/Teachers";
+import MyClasses from "./pages/MyClasses";
+import LessonManager from "./pages/LessonManager";
 import Submissions from "./pages/Submissions";
-import Profile from "./pages/Profile";
+import StudentTracker from "./pages/StudentTracker";
+import ExamPreparation from "./pages/ExamPreparation";
+import ExamPattern from "./pages/ExamPattern";
+import Calendar from "./pages/Calendar";
+import Announcements from "./pages/Announcements";
 import NotFound from "./pages/NotFound";
-import AIVoiceTutor from "./pages/AIVoiceTutor";
-import Chatbot from "./pages/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -25,12 +27,14 @@ const App = () => (
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/exam-preparation" element={<ExamPreparation />} />
-            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/my-classes" element={<MyClasses />} />
+            <Route path="/lesson-manager" element={<LessonManager />} />
             <Route path="/submissions" element={<Submissions />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/ai-tutor" element={<AIVoiceTutor />} />
-            <Route path="/chatbot" element={<Chatbot />} />
+            <Route path="/student-tracker" element={<StudentTracker />} />
+            <Route path="/exam-preparation" element={<ExamPreparation />} />
+            <Route path="/exam-pattern" element={<ExamPattern />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/announcements" element={<Announcements />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

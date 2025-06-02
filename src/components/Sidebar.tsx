@@ -2,7 +2,18 @@
 import React from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Home, Book, User, MessageSquare, ChevronLeft, FileText, Users, ClipboardEdit } from 'lucide-react';
+import { 
+  Home, 
+  Users, 
+  Book, 
+  ClipboardEdit, 
+  UserCheck, 
+  FileText, 
+  Settings,
+  Calendar,
+  Megaphone,
+  ChevronLeft 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -17,14 +28,14 @@ const AppSidebar = () => {
       icon: <Home className="h-4 w-4" />,
     },
     {
-      path: '/exam-preparation',
-      label: 'Exam Preparation',
-      icon: <FileText className="h-4 w-4" />,
+      path: '/my-classes',
+      label: 'My Classes',
+      icon: <Users className="h-4 w-4" />,
     },
     {
-      path: '/teachers',
-      label: 'Teachers',
-      icon: <Users className="h-4 w-4" />,
+      path: '/lesson-manager',
+      label: 'Lesson Manager',
+      icon: <Book className="h-4 w-4" />,
     },
     {
       path: '/submissions',
@@ -32,19 +43,29 @@ const AppSidebar = () => {
       icon: <ClipboardEdit className="h-4 w-4" />,
     },
     {
-      path: '/ai-tutor',
-      label: 'AI Voice Tutor',
-      icon: <Book className="h-4 w-4" />,
+      path: '/student-tracker',
+      label: 'Student Tracker',
+      icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      path: '/chatbot',
-      label: 'Chatbot',
-      icon: <MessageSquare className="h-4 w-4" />,
+      path: '/exam-preparation',
+      label: 'Exam Preparation',
+      icon: <FileText className="h-4 w-4" />,
     },
     {
-      path: '/profile',
-      label: 'Profile',
-      icon: <User className="h-4 w-4" />,
+      path: '/exam-pattern',
+      label: 'Exam Pattern',
+      icon: <Settings className="h-4 w-4" />,
+    },
+    {
+      path: '/calendar',
+      label: 'Calendar',
+      icon: <Calendar className="h-4 w-4" />,
+    },
+    {
+      path: '/announcements',
+      label: 'Announcements',
+      icon: <Megaphone className="h-4 w-4" />,
     },
   ];
 
@@ -65,7 +86,7 @@ const AppSidebar = () => {
       >
         <div className="h-full w-64 bg-inlustro-purple text-white shadow-lg overflow-y-auto">
           <div className="flex justify-between items-center p-4 border-b border-white/10">
-            <Link to="/" className="font-bold text-xl text-white">InLustro Admin</Link>
+            <Link to="/" className="font-bold text-xl text-white">Teacher Dashboard</Link>
             <Button 
               variant="ghost" 
               size="icon"
@@ -98,12 +119,12 @@ const AppSidebar = () => {
             </nav>
           </div>
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 text-xs text-white/70 text-center">
-            © {new Date().getFullYear()} InLustro Admin
+            © {new Date().getFullYear()} Teacher Portal
           </div>
         </div>
       </div>
       
-      {/* Overlay for mobile - closes sidebar when clicking outside */}
+      {/* Overlay for mobile */}
       {open && (
         <div 
           className="fixed inset-0 bg-black/20 z-20 md:hidden"
@@ -111,7 +132,7 @@ const AppSidebar = () => {
         />
       )}
       
-      {/* Main content adjustment based on sidebar state */}
+      {/* Main content adjustment */}
       <div 
         className={cn(
           "transition-all duration-300",
