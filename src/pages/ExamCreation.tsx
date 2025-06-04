@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -8,24 +8,88 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Upload, FileText, Download, Settings, Plus } from 'lucide-react';
+import { Upload, FileText, Download, Settings, Plus, Share2 } from 'lucide-react';
+import ExamPreview from '@/components/ExamPreview';
+import ManualQuestionForm from '@/components/ManualQuestionForm';
+
+interface Question {
+  id: string;
+  text: string;
+  marks: number;
+  type: 'mcq' | 'short' | 'long';
+  explanation?: string;
+}
+
+interface ExamData {
+  title: string;
+  className: string;
+  duration: string;
+  questions: Question[];
+  totalMarks: number;
+}
 
 const ExamCreation = () => {
+  // Form states
   const [syllabusFile, setSyllabusFile] = useState<File | null>(null);
   const [notesFile, setNotesFile] = useState<File | null>(null);
   const [selectedClass, setSelectedClass] = useState('');
   const [examTitle, setExamTitle] = useState('');
   const [examDuration, setExamDuration] = useState('');
   
+  // Question pattern state
   const [questionPattern, setQuestionPattern] = useState({
     '1-mark': 0,
     '2-mark': 0,
     '5-mark': 0,
-    '7-mark': 0,
     '15-mark': 0,
   });
 
-  const classes = ['10A', '10B', '10C'];
+  // Generated exam states
+  const [generatedExam, setGeneratedExam] = useState<ExamData | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Backend integration states
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [recentExams, setRecentExams] = useState<ExamData[]>([]);
+
+  const classes = ['10A', '10B', '10C', '9A', '9B', '8A', '8B'];
+
+  // TODO: Connect to backend API
+  useEffect(() => {
+    // Fetch recent exams from backend
+    const fetchRecentExams = async () => {
+      try {
+        // const response = await fetch('/api/exams/recent');
+        // const data = await response.json();
+        // setRecentExams(data);
+        
+        // Mock data for now
+        setRecentExams([
+          {
+            title: 'Mid-term Mathematics Exam',
+            className: '10A',
+            duration: '180',
+            questions: [],
+            totalMarks: 100
+          },
+          {
+            title: 'Quadratic Equations Quiz',
+            className: '10B',
+            duration: '60',
+            questions: [],
+            totalMarks: 60
+          }
+        ]);
+      } catch (err) {
+        console.error('Error fetching recent exams:', err);
+      }
+    };
+
+    fetchRecentExams();
+  }, []);
 
   const calculateTotalMarks = () => {
     return Object.entries(questionPattern).reduce((total, [mark, count]) => {
@@ -50,7 +114,26 @@ const ExamCreation = () => {
     });
   };
 
-  const handleCreateExam = (type: 'syllabus' | 'notes') => {
+  const generateMockQuestions = (pattern: typeof questionPattern): Question[] => {
+    const questions: Question[] = [];
+    let questionId = 1;
+
+    Object.entries(pattern).forEach(([markType, count]) => {
+      const marks = parseInt(markType.split('-')[0]);
+      for (let i = 0; i < count; i++) {
+        questions.push({
+          id: `q${questionId++}`,
+          text: `Sample ${marks}-mark question ${i + 1}. This is a generated question based on the uploaded content.`,
+          marks,
+          type: marks <= 2 ? 'short' : marks <= 5 ? 'short' : 'long',
+        });
+      }
+    });
+
+    return questions;
+  };
+
+  const handleCreateExam = async (type: 'syllabus' | 'notes') => {
     const file = type === 'syllabus' ? syllabusFile : notesFile;
     if (!file || !examTitle || !selectedClass || calculateTotalQuestions() === 0) {
       toast({
@@ -61,23 +144,145 @@ const ExamCreation = () => {
       return;
     }
 
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      // TODO: Connect to backend API
+      // const formData = new FormData();
+      // formData.append('file', file);
+      // formData.append('title', examTitle);
+      // formData.append('class', selectedClass);
+      // formData.append('duration', examDuration);
+      // formData.append('pattern', JSON.stringify(questionPattern));
+      // 
+      // const response = await fetch('/api/exams/generate', {
+      //   method: 'POST',
+      //   body: formData
+      // });
+      // 
+      // if (!response.ok) throw new Error('Failed to generate exam');
+      // const data = await response.json();
+
+      // Mock generation delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Mock generated exam data
+      const mockExam: ExamData = {
+        title: examTitle,
+        className: selectedClass,
+        duration: examDuration,
+        questions: generateMockQuestions(questionPattern),
+        totalMarks: calculateTotalMarks()
+      };
+
+      setGeneratedExam(mockExam);
+      setShowPreview(true);
+
+      toast({
+        title: "Exam generated successfully",
+        description: "Review your exam and make any necessary changes."
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate exam');
+      toast({
+        title: "Error",
+        description: "Failed to generate exam. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleAddManualQuestion = (question: Omit<Question, 'id'>) => {
+    if (!generatedExam) return;
+
+    const newQuestion: Question = {
+      ...question,
+      id: `manual-${Date.now()}`
+    };
+
+    const updatedExam = {
+      ...generatedExam,
+      questions: [...generatedExam.questions, newQuestion],
+      totalMarks: generatedExam.totalMarks + question.marks
+    };
+
+    setGeneratedExam(updatedExam);
+    setShowManualForm(false);
+
     toast({
-      title: "Exam creation started",
-      description: "Your exam is being generated. You'll be notified when it's ready."
+      title: "Question added",
+      description: "Manual question has been added to the exam."
     });
-    
-    // Reset form
-    if (type === 'syllabus') setSyllabusFile(null);
-    else setNotesFile(null);
-    setExamTitle('');
-    setExamDuration('');
-    setQuestionPattern({
-      '1-mark': 0,
-      '2-mark': 0,
-      '5-mark': 0,
-      '7-mark': 0,
-      '15-mark': 0,
-    });
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!generatedExam) return;
+
+    try {
+      // TODO: Connect to backend API
+      // const response = await fetch('/api/exams/download', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(generatedExam)
+      // });
+      // 
+      // if (!response.ok) throw new Error('Failed to download PDF');
+      // const blob = await response.blob();
+      // const url = window.URL.createObjectURL(blob);
+      // const a = document.createElement('a');
+      // a.href = url;
+      // a.download = `${generatedExam.title}.pdf`;
+      // a.click();
+
+      toast({
+        title: "Download started",
+        description: "Your exam PDF is being prepared for download."
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to download PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShareToClass = async () => {
+    if (!generatedExam) return;
+
+    try {
+      // TODO: Connect to backend API
+      // const response = await fetch('/api/exams/share', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     ...generatedExam,
+      //     shareToClass: selectedClass
+      //   })
+      // });
+      // 
+      // if (!response.ok) throw new Error('Failed to share exam');
+
+      toast({
+        title: "Exam shared",
+        description: `Exam has been shared with class ${generatedExam.className}.`
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to share exam. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBackToCreation = () => {
+    setShowPreview(false);
+    setGeneratedExam(null);
+    setShowManualForm(false);
   };
 
   const PatternSelector = () => (
@@ -114,12 +319,57 @@ const ExamCreation = () => {
     </div>
   );
 
+  if (showPreview && generatedExam) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">Exam Preview</h1>
+          <p className="text-muted-foreground">Review and customize your generated exam.</p>
+        </div>
+
+        {showManualForm && (
+          <ManualQuestionForm
+            onAddQuestion={handleAddManualQuestion}
+            onCancel={() => setShowManualForm(false)}
+          />
+        )}
+
+        {!showManualForm && (
+          <div className="flex gap-2 mb-4">
+            <Button variant="outline" onClick={() => setShowManualForm(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Manual Question
+            </Button>
+          </div>
+        )}
+
+        <ExamPreview
+          examTitle={generatedExam.title}
+          className={generatedExam.className}
+          duration={generatedExam.duration}
+          questions={generatedExam.questions}
+          totalMarks={generatedExam.totalMarks}
+          onDownload={handleDownloadPDF}
+          onShare={handleShareToClass}
+          onEdit={() => setShowManualForm(true)}
+          onBack={handleBackToCreation}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Exam Creation</h1>
         <p className="text-muted-foreground">Generate exams from syllabus content or lesson notes with customizable question patterns.</p>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
 
       <Tabs defaultValue="syllabus" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -220,10 +470,16 @@ const ExamCreation = () => {
                 <Button 
                   onClick={() => handleCreateExam('syllabus')} 
                   className="w-full mt-6"
-                  disabled={!syllabusFile || !examTitle || calculateTotalQuestions() === 0}
+                  disabled={!syllabusFile || !examTitle || calculateTotalQuestions() === 0 || isGenerating}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Generate Exam from Syllabus
+                  {isGenerating ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Exam from Syllabus
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -323,10 +579,16 @@ const ExamCreation = () => {
                 <Button 
                   onClick={() => handleCreateExam('notes')} 
                   className="w-full mt-6"
-                  disabled={!notesFile || !examTitle || calculateTotalQuestions() === 0}
+                  disabled={!notesFile || !examTitle || calculateTotalQuestions() === 0 || isGenerating}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Generate Exam from Notes
+                  {isGenerating ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Generate Exam from Notes
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -341,35 +603,29 @@ const ExamCreation = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-medium">Mid-term Mathematics Exam</h4>
-                <p className="text-sm text-muted-foreground">Class 10A • 25 questions • 100 marks</p>
-                <p className="text-xs text-muted-foreground">Created 2 days ago</p>
+            {recentExams.map((exam, index) => (
+              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                <div>
+                  <h4 className="font-medium">{exam.title}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Class {exam.className} • {exam.questions.length} questions • {exam.totalMarks} marks
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Created {index === 0 ? '2 days ago' : '1 week ago'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Share2 className="h-4 w-4 mr-1" />
+                    Share
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </Button>
-                <Button variant="outline" size="sm">Edit</Button>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-medium">Quadratic Equations Quiz</h4>
-                <p className="text-sm text-muted-foreground">Class 10B • 15 questions • 60 marks</p>
-                <p className="text-xs text-muted-foreground">Created 1 week ago</p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </Button>
-                <Button variant="outline" size="sm">Edit</Button>
-              </div>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>
