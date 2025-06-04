@@ -1,92 +1,249 @@
 
 import React, { useState } from 'react';
-import { Bell, ChevronDown, Menu } from 'lucide-react';
-import { currentUser } from '@/data/mockData';
-import {
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Link } from 'react-router-dom';
-import ProfileModal from './ProfileModal';
+import { Menu, User, Settings, LogOut, Bell } from 'lucide-react';
+import { teacherProfile } from '@/data/teacherMockData';
 
 const Header = () => {
-  const { open, setOpen } = useSidebar();
+  const { setOpen } = useSidebar();
   const [profileOpen, setProfileOpen] = useState(false);
-  const [notifications] = useState([
-    { id: 'n1', text: 'New submission from Alex Thompson', time: '10m ago' },
-    { id: 'n2', text: 'Reminder: Grade pending assignments', time: '1h ago' },
-    { id: 'n3', text: 'Parent meeting scheduled for tomorrow', time: '2h ago' },
-  ]);
+  const [profileData, setProfileData] = useState(teacherProfile);
 
-  const user = currentUser;
-  const userInitials = user.name.split(' ').map(n => n[0]).join('');
+  const handleLogout = () => {
+    console.log('Logging out...');
+    // TODO: Implement logout logic
+  };
+
+  const handleSaveProfile = () => {
+    console.log('Saving profile...', profileData);
+    // TODO: API call to update profile
+    setProfileOpen(false);
+  };
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b bg-white/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpen(!open)}
-            className="mr-2"
-            aria-label="Toggle sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/lovable-uploads/780e4ace-8ec8-4138-8f5e-e69619c11190.png" alt="InLustro Logo" className="h-10 w-auto" />
-            <span className="hidden text-xl font-bold md:inline-block text-inlustro-purple">
-              <span>InLustro Teacher</span>
-            </span>
-          </Link>
-        </div>
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 h-16">
+        <div className="flex items-center justify-between h-full px-4">
+          {/* Left side - Menu toggle and Logo */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpen(true)}
+              className="md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            
+            <div className="hidden md:flex items-center gap-2">
+              <h1 className="text-xl font-bold text-blue-600">TeacherPortal</h1>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-inlustro-purple"></span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 rounded-2xl">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {notifications.map(notification => (
-                <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3">
-                  <span className="text-sm font-medium">{notification.text}</span>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
+          {/* Right side - Notifications and Profile */}
+          <div className="flex items-center gap-4">
+            {/* Notifications */}
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                3
+              </span>
+            </Button>
+
+            {/* Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                    <AvatarFallback>
+                      {profileData.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                        <AvatarFallback>
+                          {profileData.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium leading-none">{profileData.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground mt-1">
+                          {profileData.email}
+                        </p>
+                        <Badge variant="outline" className="mt-1">
+                          {profileData.subject} Teacher
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Employee ID: {profileData.employeeId} • Classes: {profileData.classes.join(', ')}
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setProfileOpen(true)}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>View Profile</span>
                 </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="justify-center text-sm">View all notifications</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button 
-            variant="ghost" 
-            className="flex items-center gap-2"
-            onClick={() => setProfileOpen(true)}
-          >
-            <Avatar className="h-8 w-8 ring-2 ring-inlustro-purple/10">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="bg-inlustro-purple text-white">{userInitials}</AvatarFallback>
-            </Avatar>
-            <span className="hidden md:inline-block">{user.name}</span>
-            <ChevronDown className="h-4 w-4" />
-          </Button>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Preferences</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </header>
-      
-      <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
+
+      {/* Profile Modal */}
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Teacher Profile</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Profile Picture */}
+            <div className="flex items-center gap-4">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                <AvatarFallback className="text-2xl">
+                  {profileData.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-medium">{profileData.name}</h3>
+                <p className="text-muted-foreground">{profileData.subject} Teacher</p>
+                <Badge variant="outline">Employee ID: {profileData.employeeId}</Badge>
+              </div>
+            </div>
+
+            {/* Basic Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input
+                  value={profileData.name}
+                  onChange={e => setProfileData({...profileData, name: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input
+                  value={profileData.email}
+                  onChange={e => setProfileData({...profileData, email: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Subject</Label>
+                <Input
+                  value={profileData.subject}
+                  onChange={e => setProfileData({...profileData, subject: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Employee ID</Label>
+                <Input value={profileData.employeeId} disabled />
+              </div>
+            </div>
+
+            {/* Classes */}
+            <div className="space-y-2">
+              <Label>Assigned Classes</Label>
+              <div className="flex flex-wrap gap-2">
+                {profileData.classes.map(cls => (
+                  <Badge key={cls} variant="outline">{cls}</Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Preferences */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Theme</Label>
+                <Select 
+                  value={profileData.preferences.theme} 
+                  onValueChange={value => setProfileData({
+                    ...profileData, 
+                    preferences: {...profileData.preferences, theme: value}
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Language</Label>
+                <Select 
+                  value={profileData.preferences.language} 
+                  onValueChange={value => setProfileData({
+                    ...profileData, 
+                    preferences: {...profileData.preferences, language: value}
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="text-sm text-muted-foreground">
+              <p>Joined: {new Date(profileData.joinedDate).toLocaleDateString()}</p>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setProfileOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveProfile}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

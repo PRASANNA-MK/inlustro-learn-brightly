@@ -6,13 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import MyClasses from "./pages/MyClasses";
 import LessonManager from "./pages/LessonManager";
 import Submissions from "./pages/Submissions";
 import StudentTracker from "./pages/StudentTracker";
 import ExamCreation from "./pages/ExamCreation";
 import LiveScheduler from "./pages/LiveScheduler";
 import Messages from "./pages/Messages";
+import Announcements from "./pages/Announcements";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,13 +26,13 @@ const App = () => (
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/my-classes" element={<MyClasses />} />
             <Route path="/lesson-manager" element={<LessonManager />} />
             <Route path="/submissions" element={<Submissions />} />
             <Route path="/student-tracker" element={<StudentTracker />} />
             <Route path="/exam-creation" element={<ExamCreation />} />
             <Route path="/live-scheduler" element={<LiveScheduler />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/announcements" element={<Announcements />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

@@ -4,14 +4,14 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
 import { 
   Home, 
-  Users, 
   Book, 
   ClipboardEdit, 
   UserCheck, 
   FileText, 
   MessageSquare,
   Calendar,
-  ChevronLeft 
+  ChevronLeft,
+  Megaphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -27,14 +27,14 @@ const AppSidebar = () => {
       icon: <Home className="h-4 w-4" />,
     },
     {
-      path: '/my-classes',
-      label: 'My Classes',
-      icon: <Users className="h-4 w-4" />,
-    },
-    {
       path: '/lesson-manager',
       label: 'Lesson Manager',
       icon: <Book className="h-4 w-4" />,
+    },
+    {
+      path: '/exam-creation',
+      label: 'Exam Creation',
+      icon: <FileText className="h-4 w-4" />,
     },
     {
       path: '/submissions',
@@ -47,11 +47,6 @@ const AppSidebar = () => {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      path: '/exam-creation',
-      label: 'Exam Creation',
-      icon: <FileText className="h-4 w-4" />,
-    },
-    {
       path: '/live-scheduler',
       label: 'Live Class Scheduler',
       icon: <Calendar className="h-4 w-4" />,
@@ -60,6 +55,11 @@ const AppSidebar = () => {
       path: '/messages',
       label: 'Messages & Notices',
       icon: <MessageSquare className="h-4 w-4" />,
+    },
+    {
+      path: '/announcements',
+      label: 'Announcements',
+      icon: <Megaphone className="h-4 w-4" />,
     },
   ];
 
@@ -78,7 +78,7 @@ const AppSidebar = () => {
           open ? "translate-x-0" : "-translate-x-64"
         )}
       >
-        <div className="h-full w-64 bg-inlustro-purple text-white shadow-lg overflow-y-auto">
+        <div className="h-full w-64 bg-blue-600 text-white shadow-lg overflow-y-auto">
           <div className="flex justify-between items-center p-4 border-b border-white/10">
             <Link to="/" className="font-bold text-xl text-white">Teacher Dashboard</Link>
             <Button 
