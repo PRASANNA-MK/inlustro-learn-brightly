@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,9 @@ import { toast } from '@/hooks/use-toast';
 const LessonManager = () => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [newLessonOpen, setNewLessonOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lessonsData, setLessonsData] = useState(lessons);
   const [lessonData, setLessonData] = useState({
     title: '',
     class: '',
@@ -22,6 +24,36 @@ const LessonManager = () => {
     duration: '',
     content: '',
   });
+
+  // TODO: Connect to backend - Fetch lessons
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // TODO: Replace with actual API call
+        // const response = await fetch('/api/lessons', {
+        //   method: 'GET',
+        //   headers: { 'Content-Type': 'application/json' }
+        // });
+        // if (!response.ok) throw new Error('Failed to fetch lessons');
+        // const data = await response.json();
+        // setLessonsData(data);
+        
+        // Mock API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setLessonsData(lessons);
+      } catch (err) {
+        console.error('Error fetching lessons:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch lessons');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLessons();
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -45,20 +77,85 @@ const LessonManager = () => {
     }
   };
 
-  const handleCreateLesson = () => {
-    toast({
-      title: "Lesson created",
-      description: "Your new lesson has been created successfully.",
-    });
-    setNewLessonOpen(false);
-    setLessonData({ title: '', class: '', description: '', duration: '', content: '' });
+  // TODO: Connect to backend - Create new lesson
+  const handleCreateLesson = async () => {
+    if (!lessonData.title || !lessonData.class || !lessonData.description) {
+      toast({
+        title: "Error",
+        description: "Please fill all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // TODO: Replace with actual API call
+      // const response = await fetch('/api/lessons', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(lessonData)
+      // });
+      // if (!response.ok) throw new Error('Failed to create lesson');
+      // const newLesson = await response.json();
+      
+      // Mock API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Lesson created",
+        description: "Your new lesson has been created successfully.",
+      });
+      
+      setNewLessonOpen(false);
+      setLessonData({ title: '', class: '', description: '', duration: '', content: '' });
+      
+      // Refresh lessons list
+      // TODO: Refetch lessons or add new lesson to state
+    } catch (err) {
+      console.error('Error creating lesson:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create lesson');
+      toast({
+        title: "Error",
+        description: "Failed to create lesson. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleMarkComplete = (lessonId: string) => {
-    toast({
-      title: "Lesson marked as complete",
-      description: "Students can now view this lesson.",
-    });
+  // TODO: Connect to backend - Mark lesson as complete
+  const handleMarkComplete = async (lessonId: string) => {
+    try {
+      setLoading(true);
+      
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+      //   method: 'PUT',
+      //   headers: { 'Content-Type': 'application/json' }
+      // });
+      // if (!response.ok) throw new Error('Failed to update lesson status');
+      
+      // Mock API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      toast({
+        title: "Lesson marked as complete",
+        description: "Students can now view this lesson.",
+      });
+    } catch (err) {
+      console.error('Error marking lesson complete:', err);
+      toast({
+        title: "Error",
+        description: "Failed to update lesson status.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -131,8 +228,12 @@ const LessonManager = () => {
                   />
                 </div>
                 
-                <Button onClick={handleCreateLesson} className="w-full">
-                  Create Lesson
+                <Button 
+                  onClick={handleCreateLesson} 
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? 'Creating...' : 'Create Lesson'}
                 </Button>
               </div>
             </DialogContent>
@@ -140,6 +241,12 @@ const LessonManager = () => {
         </div>
         <p className="text-muted-foreground">Create, manage, and track your lesson plans</p>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -150,82 +257,91 @@ const LessonManager = () => {
         </TabsList>
         
         <TabsContent value="all" className="space-y-4">
-          <div className="grid gap-4">
-            {lessons.map((lesson) => (
-              <Card key={lesson.id} className="rounded-xl shadow-sm hover:shadow-md transition-all">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <CardTitle className="flex items-center gap-2">
-                        <Book className="h-5 w-5 text-inlustro-purple" />
-                        {lesson.title}
-                      </CardTitle>
-                      <CardDescription>{lesson.description}</CardDescription>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {lesson.duration} mins
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          Class {lesson.class}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Badge className={getStatusClass(lesson.status)}>
-                        {getStatusIcon(lesson.status)}
-                        <span className="ml-1">{lesson.status}</span>
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="space-y-4">
-                    {lesson.resources && lesson.resources.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Resources</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {lesson.resources.map((resource, index) => (
-                            <Badge key={index} variant="outline" className="flex items-center gap-1">
-                              {resource.type === 'document' && <FileText className="h-3 w-3" />}
-                              {resource.type === 'video' && <Video className="h-3 w-3" />}
-                              {resource.type === 'link' && <LinkIcon className="h-3 w-3" />}
-                              {resource.title}
-                            </Badge>
-                          ))}
+          {loading ? (
+            <div className="text-center py-8">Loading lessons...</div>
+          ) : (
+            <div className="grid gap-4">
+              {lessonsData.map((lesson) => (
+                <Card key={lesson.id} className="rounded-xl shadow-sm hover:shadow-md transition-all">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <CardTitle className="flex items-center gap-2">
+                          <Book className="h-5 w-5 text-inlustro-purple" />
+                          {lesson.title}
+                        </CardTitle>
+                        <CardDescription>{lesson.description}</CardDescription>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {lesson.duration} mins
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="h-4 w-4" />
+                            Class {lesson.class}
+                          </span>
                         </div>
                       </div>
-                    )}
-                    
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="text-sm text-muted-foreground">
-                        Progress: {lesson.studentsCompleted}/{lesson.totalStudents} students completed
-                      </div>
                       
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          Edit
-                        </Button>
-                        {lesson.status !== 'Completed' && (
-                          <Button size="sm" onClick={() => handleMarkComplete(lesson.id)}>
-                            Mark Complete
-                          </Button>
-                        )}
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusClass(lesson.status)}>
+                          {getStatusIcon(lesson.status)}
+                          <span className="ml-1">{lesson.status}</span>
+                        </Badge>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <div className="space-y-4">
+                      {lesson.resources && lesson.resources.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">Resources</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {lesson.resources.map((resource, index) => (
+                              <Badge key={index} variant="outline" className="flex items-center gap-1">
+                                {resource.type === 'document' && <FileText className="h-3 w-3" />}
+                                {resource.type === 'video' && <Video className="h-3 w-3" />}
+                                {resource.type === 'link' && <LinkIcon className="h-3 w-3" />}
+                                {resource.title}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div className="text-sm text-muted-foreground">
+                          Progress: {lesson.studentsCompleted}/{lesson.totalStudents} students completed
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            Edit
+                          </Button>
+                          {lesson.status !== 'Completed' && (
+                            <Button 
+                              size="sm" 
+                              onClick={() => handleMarkComplete(lesson.id)}
+                              disabled={loading}
+                            >
+                              Mark Complete
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
+        
         
         <TabsContent value="completed">
           <div className="grid gap-4">
-            {lessons.filter(lesson => lesson.status === 'Completed').map((lesson) => (
+            {lessonsData.filter(lesson => lesson.status === 'Completed').map((lesson) => (
               <Card key={lesson.id} className="rounded-xl shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-green-700">
@@ -246,7 +362,7 @@ const LessonManager = () => {
         
         <TabsContent value="progress">
           <div className="grid gap-4">
-            {lessons.filter(lesson => lesson.status === 'In Progress').map((lesson) => (
+            {lessonsData.filter(lesson => lesson.status === 'In Progress').map((lesson) => (
               <Card key={lesson.id} className="rounded-xl shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-orange-700">
@@ -267,7 +383,7 @@ const LessonManager = () => {
         
         <TabsContent value="pending">
           <div className="grid gap-4">
-            {lessons.filter(lesson => lesson.status === 'Pending').map((lesson) => (
+            {lessonsData.filter(lesson => lesson.status === 'Pending').map((lesson) => (
               <Card key={lesson.id} className="rounded-xl shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-gray-700">

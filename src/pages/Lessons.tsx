@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -34,6 +33,77 @@ const Lessons = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [lessons, setLessons] = useState(allLessons);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // TODO: Connect to backend - Fetch lessons data
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // TODO: Replace with actual API call
+        // const response = await fetch('/api/lessons', {
+        //   method: 'GET',
+        //   headers: { 'Content-Type': 'application/json' }
+        // });
+        // if (!response.ok) throw new Error('Failed to fetch lessons');
+        // const data = await response.json();
+        // setLessons(data);
+        
+        // Mock API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setLessons(allLessons);
+      } catch (err) {
+        console.error('Error fetching lessons:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch lessons');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLessons();
+  }, []);
+
+  // TODO: Connect to backend - Update lesson status
+  const handleMarkComplete = async () => {
+    if (!selectedLesson) return;
+
+    try {
+      setLoading(true);
+      
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/lessons/${selectedLesson.id}/complete`, {
+      //   method: 'PUT',
+      //   headers: { 'Content-Type': 'application/json' }
+      // });
+      // if (!response.ok) throw new Error('Failed to update lesson status');
+      
+      // Mock API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const updatedLessons = lessons.map(lesson =>
+        lesson.id === selectedLesson.id ? { ...lesson, status: 'Completed' } : lesson
+      );
+      setLessons(updatedLessons as Lesson[]);
+      setSelectedLesson(null);
+      
+      toast({
+        title: "Lesson completed!",
+        description: "Your progress has been updated.",
+      });
+    } catch (err) {
+      console.error('Error updating lesson status:', err);
+      toast({
+        title: "Error",
+        description: "Failed to update lesson status.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredLessons = lessons.filter(lesson => {
     const subjectMatch = selectedSubject === 'all' || lesson.subject === selectedSubject;
@@ -77,19 +147,29 @@ const Lessons = () => {
     return <BookOpen className="h-4 w-4" />;
   };
 
-  const handleMarkComplete = () => {
-    if (selectedLesson) {
-      const updatedLessons = lessons.map(lesson =>
-        lesson.id === selectedLesson.id ? { ...lesson, status: 'Completed' } : lesson
-      );
-      setLessons(updatedLessons as Lesson[]);
-      setSelectedLesson(null);
-      toast({
-        title: "Lesson completed!",
-        description: "Your progress has been updated.",
-      });
-    }
-  };
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">Lessons</h1>
+          <p className="text-muted-foreground">Loading lessons...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl font-bold tracking-tight">Lessons</h1>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -201,7 +281,9 @@ const Lessons = () => {
               </Badge>
               
               {selectedLesson.status !== 'Completed' && (
-                <Button onClick={handleMarkComplete}>Mark as Completed</Button>
+                <Button onClick={handleMarkComplete} disabled={loading}>
+                  {loading ? 'Updating...' : 'Mark as Completed'}
+                </Button>
               )}
             </DialogFooter>
           </DialogContent>
