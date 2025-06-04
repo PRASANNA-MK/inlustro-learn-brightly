@@ -1,360 +1,160 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Users, 
-  TrendingUp, 
-  TrendingDown, 
-  Minus,
-  Search,
-  Download,
-  Filter,
-  Eye
-} from 'lucide-react';
-import { studentPerformance, teacherClasses } from '@/data/teacherMockData';
+import { students, lessons, submissions } from '@/data/mockData';
+import { TrendingUp, TrendingDown, Clock, CheckCircle } from 'lucide-react';
 
 const StudentTracker = () => {
-  const [students, setStudents] = useState(studentPerformance);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    class: '',
-    grade: '',
-    trend: ''
-  });
-
-  // TODO: Connect to backend API
-  useEffect(() => {
-    const fetchStudentPerformance = async () => {
-      setLoading(true);
-      try {
-        // const response = await fetch('/api/teacher/student-performance');
-        // const data = await response.json();
-        // setStudents(data);
-        setStudents(studentPerformance);
-      } catch (error) {
-        console.error('Failed to fetch student performance:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchStudentPerformance();
-  }, []);
-
-  const getTrendIcon = (trend) => {
-    switch (trend) {
-      case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'down':
-        return <TrendingDown className="h-4 w-4 text-red-500" />;
-      default:
-        return <Minus className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getGradeColor = (grade) => {
-    if (grade === 'A' || grade === 'A+') return 'bg-green-100 text-green-800';
-    if (grade === 'B+' || grade === 'B') return 'bg-blue-100 text-blue-800';
-    if (grade === 'B-' || grade === 'C+') return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
+  const [selectedStudent, setSelectedStudent] = useState<string>('all');
+  const [selectedClass, setSelectedClass] = useState<string>('all');
 
   const filteredStudents = students.filter(student => {
-    if (searchTerm && !student.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    if (filters.class && student.class !== filters.class) return false;
-    if (filters.grade && student.overallGrade !== filters.grade) return false;
-    if (filters.trend && student.trend !== filters.trend) return false;
-    return true;
+    const classMatch = selectedClass === 'all' || student.class === selectedClass;
+    const studentMatch = selectedStudent === 'all' || student.id === selectedStudent;
+    return classMatch && studentMatch;
   });
 
-  const topPerformers = students
-    .sort((a, b) => (b.assignmentScore + b.quizScore) / 2 - (a.assignmentScore + a.quizScore) / 2)
-    .slice(0, 3);
-
-  const lowPerformers = students
-    .sort((a, b) => (a.assignmentScore + a.quizScore) / 2 - (b.assignmentScore + b.quizScore) / 2)
-    .slice(0, 3);
-
-  const handleExportReport = async () => {
-    try {
-      // TODO: API call to generate performance report
-      // const response = await fetch('/api/teacher/reports/performance', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ students: filteredStudents })
-      // });
-
-      // Simulate file download
-      console.log('Generating performance report...');
-    } catch (error) {
-      console.error('Failed to export report:', error);
-    }
-  };
+  const classes = ['10A', '10B', '10C'];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Student Performance Tracker</h1>
-          <p className="text-muted-foreground">Monitor and track student performance across subjects</p>
-        </div>
-        <Button onClick={handleExportReport} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export Report
-        </Button>
+      <div className="flex flex-col gap-4">
+        <h1 className="text-3xl font-bold tracking-tight">Student Tracker</h1>
+        <p className="text-muted-foreground">Monitor individual student progress across lessons and assignments.</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
-              Total Students
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{students.length}</div>
-            <p className="text-sm text-muted-foreground">Across all classes</p>
-          </CardContent>
-        </Card>
+      <div className="flex flex-wrap items-center gap-4">
+        <Select value={selectedClass} onValueChange={setSelectedClass}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Class" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Classes</SelectItem>
+            {classes.map(cls => (
+              <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Average Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(students.reduce((acc, s) => acc + (s.assignmentScore + s.quizScore) / 2, 0) / students.length)}%
-            </div>
-            <p className="text-sm text-muted-foreground">Overall class average</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Improvement Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-green-500" />
-              <span className="text-2xl font-bold">
-                {students.filter(s => s.trend === 'up').length}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">Students improving</p>
-          </CardContent>
-        </Card>
+        <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select Student" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Students</SelectItem>
+            {students.map(student => (
+              <SelectItem key={student.id} value={student.id}>{student.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Top and Low Performers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-500" />
-              Top Performers
-            </CardTitle>
-            <CardDescription>Students with highest scores</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {topPerformers.map((student, index) => (
-              <div key={student.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-sm text-muted-foreground">Class {student.class}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{Math.round((student.assignmentScore + student.quizScore) / 2)}%</p>
-                  <Badge className={getGradeColor(student.overallGrade)}>
-                    {student.overallGrade}
-                  </Badge>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredStudents.map(student => (
+          <Card key={student.id} className="overflow-hidden">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src={student.avatar} alt={student.name} />
+                  <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <CardTitle className="text-lg">{student.name}</CardTitle>
+                  <CardDescription>{student.class} - {student.rollNumber}</CardDescription>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-red-500" />
-              Needs Attention
-            </CardTitle>
-            <CardDescription>Students requiring extra support</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {lowPerformers.map((student, index) => (
-              <div key={student.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-sm font-bold">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-sm text-muted-foreground">Class {student.class}</p>
-                  </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Overall Performance</span>
+                  <span className="text-sm text-muted-foreground">{student.performance.averageScore}%</span>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">{Math.round((student.assignmentScore + student.quizScore) / 2)}%</p>
-                  <Badge className={getGradeColor(student.overallGrade)}>
-                    {student.overallGrade}
-                  </Badge>
+                <Progress value={student.performance.averageScore} className="h-2" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-medium">Lessons</span>
+                  </div>
+                  <p className="text-2xl font-bold">{student.performance.lessonsCompleted}</p>
+                  <p className="text-xs text-muted-foreground">of {student.performance.totalLessons}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium">Submissions</span>
+                  </div>
+                  <p className="text-2xl font-bold">{student.performance.submissionsCompleted}</p>
+                  <p className="text-xs text-muted-foreground">{student.performance.pendingSubmissions} pending</p>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+
+              <div className="flex items-center justify-between pt-2 border-t">
+                <span className="text-xs text-muted-foreground">Last active</span>
+                <span className="text-xs">{new Date(student.lastActive).toLocaleDateString()}</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filter Students
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Input
-                placeholder="Search students..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <div className="space-y-2">
-              <Select value={filters.class} onValueChange={value => setFilters({...filters, class: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All classes" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Classes</SelectItem>
-                  {teacherClasses.map(cls => (
-                    <SelectItem key={cls.id} value={cls.name}>{cls.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Select value={filters.grade} onValueChange={value => setFilters({...filters, grade: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All grades" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Grades</SelectItem>
-                  <SelectItem value="A+">A+</SelectItem>
-                  <SelectItem value="A">A</SelectItem>
-                  <SelectItem value="B+">B+</SelectItem>
-                  <SelectItem value="B">B</SelectItem>
-                  <SelectItem value="B-">B-</SelectItem>
-                  <SelectItem value="C+">C+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Select value={filters.trend} onValueChange={value => setFilters({...filters, trend: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All trends" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Trends</SelectItem>
-                  <SelectItem value="up">Improving</SelectItem>
-                  <SelectItem value="stable">Stable</SelectItem>
-                  <SelectItem value="down">Declining</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Student Performance Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Detailed Performance View</CardTitle>
-          <CardDescription>Subject-wise performance tracking</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="text-center py-8">
-              <p>Loading student data...</p>
-            </div>
-          ) : filteredStudents.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No students found matching the filters.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredStudents.map((student) => (
-                <div key={student.id} className="border rounded-lg p-4 hover:shadow-md transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={`/avatars/${student.name.toLowerCase().replace(' ', '-')}.png`} />
-                        <AvatarFallback>
-                          {student.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+      {selectedStudent !== 'all' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Detailed Progress</CardTitle>
+            <CardDescription>Lesson and assignment breakdown for selected student</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="lessons" className="w-full">
+              <TabsList>
+                <TabsTrigger value="lessons">Lessons</TabsTrigger>
+                <TabsTrigger value="submissions">Submissions</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="lessons" className="space-y-4">
+                <div className="space-y-3">
+                  {lessons.map(lesson => (
+                    <div key={lesson.id} className="flex items-center justify-between p-3 rounded-lg border">
                       <div>
-                        <h3 className="font-medium">{student.name}</h3>
-                        <p className="text-sm text-muted-foreground">Class {student.class}</p>
+                        <h4 className="font-medium">{lesson.title}</h4>
+                        <p className="text-sm text-muted-foreground">{lesson.class} - {lesson.duration} min</p>
                       </div>
+                      <Badge variant={lesson.status === 'Completed' ? 'default' : 'secondary'}>
+                        {lesson.status}
+                      </Badge>
                     </div>
-                    
-                    <div className="flex items-center gap-6">
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Assignment</p>
-                        <p className="font-medium">{student.assignmentScore}%</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Quiz</p>
-                        <p className="font-medium">{student.quizScore}%</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Grade</p>
-                        <Badge className={getGradeColor(student.overallGrade)}>
-                          {student.overallGrade}
-                        </Badge>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Trend</p>
-                        {getTrendIcon(student.trend)}
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
-                        View Details
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {student.remarks && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Remarks:</strong> {student.remarks}
-                      </p>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </TabsContent>
+              
+              <TabsContent value="submissions" className="space-y-4">
+                <div className="space-y-3">
+                  {submissions.map(submission => (
+                    <div key={submission.id} className="flex items-center justify-between p-3 rounded-lg border">
+                      <div>
+                        <h4 className="font-medium">{submission.title}</h4>
+                        <p className="text-sm text-muted-foreground">{submission.type} - Due: {new Date(submission.dueDate).toLocaleDateString()}</p>
+                      </div>
+                      <Badge variant={submission.status === 'Completed' ? 'default' : 'secondary'}>
+                        {submission.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
