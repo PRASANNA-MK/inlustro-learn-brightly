@@ -9,9 +9,8 @@ import {
   ClipboardEdit, 
   UserCheck, 
   FileText, 
-  Settings,
+  MessageSquare,
   Calendar,
-  Megaphone,
   ChevronLeft 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,24 +47,19 @@ const AppSidebar = () => {
       icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      path: '/exam-preparation',
-      label: 'Exam Preparation',
+      path: '/exam-creation',
+      label: 'Exam Creation',
       icon: <FileText className="h-4 w-4" />,
     },
     {
-      path: '/exam-pattern',
-      label: 'Exam Pattern',
-      icon: <Settings className="h-4 w-4" />,
-    },
-    {
-      path: '/calendar',
-      label: 'Calendar',
+      path: '/live-scheduler',
+      label: 'Live Class Scheduler',
       icon: <Calendar className="h-4 w-4" />,
     },
     {
-      path: '/announcements',
-      label: 'Announcements',
-      icon: <Megaphone className="h-4 w-4" />,
+      path: '/messages',
+      label: 'Messages & Notices',
+      icon: <MessageSquare className="h-4 w-4" />,
     },
   ];
 

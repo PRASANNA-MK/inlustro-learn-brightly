@@ -4,408 +4,426 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, FileText, Download, Eye, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-// Mock data for submissions
-const submissionsMockData = [
-  {
-    id: 's001',
-    student: 'John Smith',
-    class: '10A',
-    exam: 'Mathematics Mid-Term',
-    subject: 'Mathematics',
-    score: 85,
-    maxScore: 100,
-    submitDate: '2025-04-10T14:30:00',
-    status: 'graded',
-  },
-  {
-    id: 's002',
-    student: 'Emma Johnson',
-    class: '10A',
-    exam: 'Mathematics Mid-Term',
-    subject: 'Mathematics',
-    score: 92,
-    maxScore: 100,
-    submitDate: '2025-04-10T15:15:00',
-    status: 'graded',
-  },
-  {
-    id: 's003',
-    student: 'Michael Brown',
-    class: '10B',
-    exam: 'Physics Quiz',
-    subject: 'Physics',
-    score: 78,
-    maxScore: 100,
-    submitDate: '2025-04-12T10:45:00',
-    status: 'graded',
-  },
-  {
-    id: 's004',
-    student: 'Sophia Garcia',
-    class: '10B',
-    exam: 'Physics Quiz',
-    subject: 'Physics',
-    score: 88,
-    maxScore: 100,
-    submitDate: '2025-04-12T11:20:00',
-    status: 'graded',
-  },
-  {
-    id: 's005',
-    student: 'William Davis',
-    class: '11A',
-    exam: 'Chemistry Test',
-    subject: 'Chemistry',
-    score: null,
-    maxScore: 100,
-    submitDate: '2025-04-14T09:10:00',
-    status: 'pending',
-  },
-  {
-    id: 's006',
-    student: 'Olivia Martinez',
-    class: '11A',
-    exam: 'Chemistry Test',
-    subject: 'Chemistry',
-    score: null,
-    maxScore: 100,
-    submitDate: '2025-04-14T09:30:00',
-    status: 'pending',
-  },
-  {
-    id: 's007',
-    student: 'James Wilson',
-    class: '9C',
-    exam: 'History Mid-Term',
-    subject: 'History',
-    score: null,
-    maxScore: 100,
-    submitDate: '2025-04-15T13:45:00',
-    status: 'pending',
-  },
-  {
-    id: 's008',
-    student: 'Isabella Moore',
-    class: '9C',
-    exam: 'History Mid-Term',
-    subject: 'History',
-    score: null,
-    maxScore: 100,
-    submitDate: '2025-04-15T14:10:00',
-    status: 'pending',
-  },
-];
-
-// Get unique subject classes
-const subjects = [...new Set(submissionsMockData.map(item => item.subject))];
-const classes = [...new Set(submissionsMockData.map(item => item.class))];
+import { Progress } from '@/components/ui/progress';
+import { submissions, students } from '@/data/mockData';
+import { toast } from '@/hooks/use-toast';
+import { Plus, Eye, CheckCircle, Clock, MessageSquare, Filter, Download } from 'lucide-react';
 
 const Submissions = () => {
-  const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [selectedClass, setSelectedClass] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const filteredSubmissions = submissionsMockData.filter(submission => {
-    const matchesSearch = searchTerm === '' || 
-      submission.student.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      submission.exam.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesSubject = selectedSubject ? submission.subject === selectedSubject : true;
-    const matchesClass = selectedClass ? submission.class === selectedClass : true;
-    
-    return matchesSearch && matchesSubject && matchesClass;
+  const [selectedClass, setSelectedClass] = useState('all');
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [newAssignmentTitle, setNewAssignmentTitle] = useState('');
+  const [newAssignmentDescription, setNewAssignmentDescription] = useState('');
+  const [newAssignmentClass, setNewAssignmentClass] = useState('');
+  const [newAssignmentDueDate, setNewAssignmentDueDate] = useState('');
+
+  const classes = ['10A', '10B', '10C'];
+  const subjects = ['Mathematics', 'Physics', 'Chemistry'];
+  const statuses = ['Active', 'Completed', 'Overdue'];
+
+  const filteredSubmissions = submissions.filter(submission => {
+    const classMatch = selectedClass === 'all' || submission.class === selectedClass;
+    const subjectMatch = selectedSubject === 'all' || submission.subject === selectedSubject;
+    const statusMatch = selectedStatus === 'all' || submission.status === selectedStatus;
+    return classMatch && subjectMatch && statusMatch;
   });
-  
-  const pendingSubmissions = filteredSubmissions.filter(s => s.status === 'pending');
-  const gradedSubmissions = filteredSubmissions.filter(s => s.status === 'graded');
-  
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-  };
-  
-  const handleDownload = (submission: any) => {
-    toast({
-      title: "Downloading Submission",
-      description: `Downloading ${submission.student}'s submission for ${submission.exam}.`,
-    });
-  };
-  
-  const handleGrade = (submission: any) => {
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
+
+  const studentSubmissions = [
+    {
+      id: 1,
+      studentName: 'Emma Davis',
+      submissionTitle: 'Quadratic Equations Homework',
+      class: '10A',
+      submittedDate: '2024-06-02T14:30:00Z',
+      status: 'submitted',
+      grade: null,
+      feedback: ''
+    },
+    {
+      id: 2,
+      studentName: 'Alex Thompson',
+      submissionTitle: 'Algebra Practice Test',
+      class: '10A',
+      submittedDate: '2024-06-01T16:45:00Z',
+      status: 'reviewed',
+      grade: 85,
+      feedback: 'Good work! Pay attention to step 3 in problem 5.'
+    }
+  ];
+
+  const handleCreateAssignment = () => {
+    if (!newAssignmentTitle || !newAssignmentDescription || !newAssignmentClass || !newAssignmentDueDate) {
       toast({
-        title: "Grading Interface Open",
-        description: `Now grading ${submission.student}'s submission for ${submission.exam}.`,
+        title: "Error",
+        description: "Please fill all required fields.",
+        variant: "destructive"
       });
-    }, 1000);
+      return;
+    }
+
+    toast({
+      title: "Assignment created",
+      description: `"${newAssignmentTitle}" has been assigned to ${newAssignmentClass}.`
+    });
+
+    // Reset form
+    setNewAssignmentTitle('');
+    setNewAssignmentDescription('');
+    setNewAssignmentClass('');
+    setNewAssignmentDueDate('');
   };
 
-  const handleViewDetails = (submission: any) => {
+  const handleGradeSubmission = (submissionId: number, grade: number, feedback: string) => {
     toast({
-      title: "Viewing Submission Details",
-      description: `Viewing detailed results for ${submission.student}'s ${submission.exam}.`,
+      title: "Submission graded",
+      description: "Grade and feedback have been saved."
     });
   };
-  
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return 'default';
+      case 'Completed': return 'secondary';
+      case 'Overdue': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Submissions</h1>
-        <p className="text-muted-foreground">View and grade student exam submissions.</p>
+        <p className="text-muted-foreground">Create assignments, track submissions, and provide feedback to students.</p>
       </div>
-      
-      <div className="flex flex-wrap gap-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search submissions..."
-            className="pl-8 rounded-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="w-full sm:w-auto">
-          <Select value={selectedSubject || ''} onValueChange={(val) => setSelectedSubject(val || null)}>
-            <SelectTrigger className="w-[180px] rounded-full">
-              <SelectValue placeholder="Filter by subject" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Subjects</SelectItem>
-              {subjects.map(subject => (
-                <SelectItem key={subject} value={subject}>{subject}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="w-full sm:w-auto">
-          <Select value={selectedClass || ''} onValueChange={(val) => setSelectedClass(val || null)}>
-            <SelectTrigger className="w-[180px] rounded-full">
-              <SelectValue placeholder="Filter by class" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Classes</SelectItem>
-              {classes.map(className => (
-                <SelectItem key={className} value={className}>{className}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      <Tabs defaultValue="pending" className="space-y-4">
-        <TabsList className="rounded-full bg-muted p-1">
-          <TabsTrigger value="pending" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">
-            Pending
-            <Badge variant="outline" className="ml-2 bg-inlustro-purple/10">{pendingSubmissions.length}</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="graded" className="rounded-full data-[state=active]:bg-inlustro-purple data-[state=active]:text-white">
-            Graded
-            <Badge variant="outline" className="ml-2 bg-inlustro-purple/10">{gradedSubmissions.length}</Badge>
-          </TabsTrigger>
+
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="create">Create Assignment</TabsTrigger>
+          <TabsTrigger value="review">Review Submissions</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="pending">
-          <Card className="rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent">
-              <CardTitle>Pending Submissions</CardTitle>
-              <CardDescription>Submissions that need to be graded.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center space-x-4">
-                      <Skeleton className="h-12 w-full" />
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <Select value={selectedClass} onValueChange={setSelectedClass}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Class" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Classes</SelectItem>
+                {classes.map(cls => (
+                  <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Subject" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Subjects</SelectItem>
+                {subjects.map(subject => (
+                  <SelectItem key={subject} value={subject}>{subject}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                {statuses.map(status => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid gap-6">
+            {filteredSubmissions.map(submission => (
+              <Card key={submission.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{submission.title}</CardTitle>
+                      <CardDescription>
+                        {submission.type} • {submission.class} • Due: {new Date(submission.dueDate).toLocaleDateString()}
+                      </CardDescription>
                     </div>
-                  ))}
-                </div>
-              ) : pendingSubmissions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                    <AlertCircle className="h-6 w-6 text-muted-foreground" />
+                    <Badge variant={getStatusColor(submission.status)}>{submission.status}</Badge>
                   </div>
-                  <h3 className="text-lg font-medium">No pending submissions</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    All submissions have been graded
-                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-blue-600">{submission.submittedCount}</p>
+                      <p className="text-sm text-muted-foreground">Submitted</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-green-600">{submission.reviewedCount}</p>
+                      <p className="text-sm text-muted-foreground">Reviewed</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-orange-600">{submission.pendingReview}</p>
+                      <p className="text-sm text-muted-foreground">Pending</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-purple-600">{submission.averageScore}%</p>
+                      <p className="text-sm text-muted-foreground">Avg Score</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span>Submission Progress</span>
+                      <span>{submission.submittedCount}/{submission.totalStudents}</span>
+                    </div>
+                    <Progress value={(submission.submittedCount / submission.totalStudents) * 100} className="h-2" />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline">
+                      <Eye className="h-4 w-4 mr-1" />
+                      View Details
+                    </Button>
+                    <Button size="sm" variant="outline">
+                      <Download className="h-4 w-4 mr-1" />
+                      Download All
+                    </Button>
+                    {submission.pendingReview > 0 && (
+                      <Button size="sm">
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Review ({submission.pendingReview})
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="create" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Create New Assignment
+              </CardTitle>
+              <CardDescription>Set up a new assignment or homework for your students</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="assignment-title">Assignment Title</Label>
+                  <Input
+                    id="assignment-title"
+                    placeholder="e.g., Chapter 5 Homework"
+                    value={newAssignmentTitle}
+                    onChange={e => setNewAssignmentTitle(e.target.value)}
+                  />
                 </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Class</TableHead>
-                      <TableHead>Exam</TableHead>
-                      <TableHead>Submitted</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingSubmissions.map((submission) => (
-                      <TableRow key={submission.id} className="hover:bg-muted/50">
-                        <TableCell className="font-medium">{submission.student}</TableCell>
-                        <TableCell>{submission.class}</TableCell>
-                        <TableCell>{submission.exam}</TableCell>
-                        <TableCell>{formatDate(submission.submitDate)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleDownload(submission)}
-                                    className="h-8 rounded-full"
-                                  >
-                                    <Download className="h-3.5 w-3.5 mr-1" />
-                                    Download
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Download submission</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    size="sm"
-                                    onClick={() => handleGrade(submission)}
-                                    className="h-8 rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90"
-                                  >
-                                    Grade
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Grade this submission</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="assignment-class">Select Class</Label>
+                  <Select value={newAssignmentClass} onValueChange={setNewAssignmentClass}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map(cls => (
+                        <SelectItem key={cls} value={cls}>{cls}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="assignment-description">Description & Instructions</Label>
+                <Textarea
+                  id="assignment-description"
+                  placeholder="Provide detailed instructions for the assignment..."
+                  rows={4}
+                  value={newAssignmentDescription}
+                  onChange={e => setNewAssignmentDescription(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="due-date">Due Date</Label>
+                  <Input
+                    id="due-date"
+                    type="datetime-local"
+                    value={newAssignmentDueDate}
+                    onChange={e => setNewAssignmentDueDate(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="max-marks">Maximum Marks</Label>
+                  <Input
+                    id="max-marks"
+                    type="number"
+                    placeholder="e.g., 100"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Submission Type</Label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="submission-type" value="file" defaultChecked />
+                    File Upload
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="submission-type" value="text" />
+                    Text Response
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="submission-type" value="both" />
+                    Both
+                  </label>
+                </div>
+              </div>
+
+              <Button onClick={handleCreateAssignment} className="w-full">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Assignment
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="graded">
-          <Card className="rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent">
-              <CardTitle>Graded Submissions</CardTitle>
-              <CardDescription>Submissions that have been graded.</CardDescription>
+
+        <TabsContent value="review" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                Student Submissions
+              </CardTitle>
+              <CardDescription>Review and grade student work</CardDescription>
             </CardHeader>
             <CardContent>
-              {gradedSubmissions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-medium">No graded submissions</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Grade some submissions to see them here
-                  </p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Class</TableHead>
-                      <TableHead>Exam</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Submitted</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {gradedSubmissions.map((submission) => (
-                      <TableRow key={submission.id} className="hover:bg-muted/50">
-                        <TableCell className="font-medium">{submission.student}</TableCell>
-                        <TableCell>{submission.class}</TableCell>
-                        <TableCell>{submission.exam}</TableCell>
-                        <TableCell>
-                          <span className={`font-medium ${submission.score! >= 80 ? "text-green-600" : submission.score! >= 70 ? "text-amber-600" : "text-red-600"}`}>
-                            {submission.score} / {submission.maxScore}
-                          </span>
-                        </TableCell>
-                        <TableCell>{formatDate(submission.submitDate)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleDownload(submission)}
-                                    className="h-8 rounded-full"
-                                  >
-                                    <Download className="h-3.5 w-3.5 mr-1" />
-                                    Download
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Download submission</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button 
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewDetails(submission)}
-                                    className="h-8 rounded-full"
-                                  >
-                                    <Eye className="h-3.5 w-3.5 mr-1" />
-                                    View
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>View details</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+              <div className="space-y-4">
+                {studentSubmissions.map(submission => (
+                  <div key={submission.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-medium">{submission.studentName}</h4>
+                        <p className="text-sm text-muted-foreground">{submission.submissionTitle}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {submission.class} • Submitted: {new Date(submission.submittedDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Badge variant={submission.status === 'reviewed' ? 'default' : 'secondary'}>
+                        {submission.status}
+                      </Badge>
+                    </div>
+
+                    {submission.status === 'reviewed' ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Grade:</span>
+                          <Badge variant="outline">{submission.grade}/100</Badge>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">Feedback:</span>
+                          <p className="text-sm text-muted-foreground mt-1">{submission.feedback}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`grade-${submission.id}`}>Grade (out of 100)</Label>
+                            <Input
+                              id={`grade-${submission.id}`}
+                              type="number"
+                              min="0"
+                              max="100"
+                              placeholder="Enter grade"
+                            />
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`feedback-${submission.id}`}>Feedback</Label>
+                          <Textarea
+                            id={`feedback-${submission.id}`}
+                            placeholder="Provide feedback to the student..."
+                            rows={3}
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm"
+                            onClick={() => handleGradeSubmission(submission.id, 85, 'Good work!')}
+                          >
+                            Save Grade
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View File
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Submission Rate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-green-600">78%</p>
+                  <p className="text-sm text-muted-foreground">Average across all classes</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Average Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-blue-600">82</p>
+                  <p className="text-sm text-muted-foreground">Out of 100</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>On-Time Rate</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-purple-600">91%</p>
+                  <p className="text-sm text-muted-foreground">Submitted before deadline</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

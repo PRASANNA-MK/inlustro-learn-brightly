@@ -10,10 +10,9 @@ import MyClasses from "./pages/MyClasses";
 import LessonManager from "./pages/LessonManager";
 import Submissions from "./pages/Submissions";
 import StudentTracker from "./pages/StudentTracker";
-import ExamPreparation from "./pages/ExamPreparation";
-import ExamPattern from "./pages/ExamPattern";
-import Calendar from "./pages/Calendar";
-import Announcements from "./pages/Announcements";
+import ExamCreation from "./pages/ExamCreation";
+import LiveScheduler from "./pages/LiveScheduler";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,10 +30,9 @@ const App = () => (
             <Route path="/lesson-manager" element={<LessonManager />} />
             <Route path="/submissions" element={<Submissions />} />
             <Route path="/student-tracker" element={<StudentTracker />} />
-            <Route path="/exam-preparation" element={<ExamPreparation />} />
-            <Route path="/exam-pattern" element={<ExamPattern />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/announcements" element={<Announcements />} />
+            <Route path="/exam-creation" element={<ExamCreation />} />
+            <Route path="/live-scheduler" element={<LiveScheduler />} />
+            <Route path="/messages" element={<Messages />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

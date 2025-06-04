@@ -4,10 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { currentUser, weeklyActivity, lessons, submissions, students } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
-import { Book, Users, ClipboardEdit, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { Book, Users, ClipboardEdit, CheckCircle2, Clock, AlertTriangle, Upload, Calendar, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 
 const Dashboard = () => {
   const completedLessons = lessons.filter(lesson => lesson.status === 'Completed').length;
@@ -15,10 +14,55 @@ const Dashboard = () => {
   const totalStudents = students.length;
   const activeClasses = currentUser.classes.length;
 
-  const upcomingTasks = [
-    { id: 1, title: 'Grade Quadratic Equations Homework', type: 'Review', dueDate: '2024-06-03', priority: 'High' },
-    { id: 2, title: 'Prepare Lesson: Graphing Functions', type: 'Lesson Prep', dueDate: '2024-06-04', priority: 'Medium' },
-    { id: 3, title: 'Parent Meeting - Emma Davis', type: 'Meeting', dueDate: '2024-06-05', priority: 'Low' },
+  const pendingEvaluations = [
+    { id: 1, title: 'Algebra Quiz - 10A', submissions: 25, dueDate: '2024-06-04' },
+    { id: 2, title: 'Geometry Assignment - 10B', submissions: 18, dueDate: '2024-06-05' },
+    { id: 3, title: 'Trigonometry Test - 10C', submissions: 22, dueDate: '2024-06-06' }
+  ];
+
+  const recentActivity = [
+    { action: 'Created lesson', details: 'Quadratic Equations', time: '2 hours ago' },
+    { action: 'Graded submissions', details: '15 homework papers', time: 'Yesterday' },
+    { action: 'Scheduled live class', details: 'Algebra Review - 10A', time: '2 days ago' },
+    { action: 'Sent announcement', details: 'Test postponement notice', time: '3 days ago' }
+  ];
+
+  const quickActions = [
+    {
+      title: 'Upload Content',
+      description: 'Add new lessons and resources',
+      icon: <Upload className="h-6 w-6" />,
+      link: '/lesson-manager',
+      color: 'blue'
+    },
+    {
+      title: 'Assign Homework',
+      description: 'Create new assignments',
+      icon: <ClipboardEdit className="h-6 w-6" />,
+      link: '/submissions',
+      color: 'green'
+    },
+    {
+      title: 'Create Exam',
+      description: 'Generate from syllabus or notes',
+      icon: <Book className="h-6 w-6" />,
+      link: '/exam-creation',
+      color: 'purple'
+    },
+    {
+      title: 'Schedule Class',
+      description: 'Set up live sessions',
+      icon: <Calendar className="h-6 w-6" />,
+      link: '/live-scheduler',
+      color: 'orange'
+    },
+    {
+      title: 'Send Notice',
+      description: 'Communicate with students',
+      icon: <MessageSquare className="h-6 w-6" />,
+      link: '/messages',
+      color: 'red'
+    }
   ];
 
   return (
@@ -33,7 +77,7 @@ const Dashboard = () => {
           </div>
         </div>
         <p className="text-muted-foreground">
-          Teaching {currentUser.grade} • Classes: {currentUser.classes.join(', ')}
+          Teaching {currentUser.grade} • Classes: {currentUser.classes.join(', ')} • Last login: {new Date(currentUser.lastLogin).toLocaleDateString()}
         </p>
       </div>
       
@@ -65,7 +109,7 @@ const Dashboard = () => {
             <CardTitle className="text-base">Lessons Completed</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">This week</p>
+            <p className="text-sm text-muted-foreground">This month</p>
           </CardContent>
         </Card>
 
@@ -101,85 +145,73 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link to="/lesson-manager" className="block">
-          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
-                <Book className="h-6 w-6 text-inlustro-purple" />
-              </div>
-              <CardTitle className="mt-2">Manage Lessons</CardTitle>
-              <CardDescription>Create and organize lesson plans</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Add new lessons, upload resources, and track student progress.
-              </p>
-              <div className="mt-4">
-                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
-                  Go to Lessons
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+      <Card className="rounded-3xl shadow-inlustro border-0">
+        <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Common tasks for efficient teaching</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {quickActions.map((action, index) => (
+              <Link key={index} to={action.link} className="block">
+                <Card className="h-full hover:shadow-lg transition-all border-2 hover:border-inlustro-purple/20">
+                  <CardContent className="p-4 text-center">
+                    <div className={`w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center bg-${action.color}-500/10`}>
+                      <div className={`text-${action.color}-500`}>
+                        {action.icon}
+                      </div>
+                    </div>
+                    <h3 className="font-medium text-sm mb-1">{action.title}</h3>
+                    <p className="text-xs text-muted-foreground">{action.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-        <Link to="/submissions" className="block">
-          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
-                <ClipboardEdit className="h-6 w-6 text-inlustro-purple" />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Pending Evaluations */}
+        <Card className="rounded-3xl shadow-inlustro border-0">
+          <CardHeader className="bg-gradient-to-r from-orange-500/10 to-transparent rounded-t-3xl">
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Pending Evaluations
+            </CardTitle>
+            <CardDescription>Submissions waiting for review</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {pendingEvaluations.map((item) => (
+              <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{item.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.submissions} submissions • Due: {new Date(item.dueDate).toLocaleDateString()}
+                  </p>
+                </div>
+                <Button size="sm" variant="outline">Review</Button>
               </div>
-              <CardTitle className="mt-2">Review Submissions</CardTitle>
-              <CardDescription>Grade assignments and homework</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View student submissions and provide feedback.
-              </p>
-              <div className="mt-4">
-                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
-                  Review Work
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+            ))}
+            <Link to="/submissions">
+              <Button variant="ghost" className="w-full mt-2 text-inlustro-purple hover:text-inlustro-purple/80 hover:bg-inlustro-purple/10">
+                View All Submissions
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
 
-        <Link to="/exam-preparation" className="block">
-          <Card className="h-full hover:shadow-lg transition-all rounded-3xl shadow-inlustro border-0">
-            <CardHeader className="pb-2 bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-              <div className="w-12 h-12 rounded-full bg-inlustro-purple/10 flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-inlustro-purple" />
-              </div>
-              <CardTitle className="mt-2">Prepare Exams</CardTitle>
-              <CardDescription>Create and manage examinations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Generate exams from syllabus or lesson notes.
-              </p>
-              <div className="mt-4">
-                <Button className="w-full rounded-full bg-inlustro-purple hover:bg-inlustro-purple/90">
-                  Create Exam
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Activity Chart and Upcoming Tasks */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Weekly Activity Chart */}
         <Card className="rounded-3xl shadow-inlustro border-0">
           <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
               Weekly Activity
             </CardTitle>
-            <CardDescription>Lessons taught and submissions reviewed</CardDescription>
+            <CardDescription>Your teaching activity this week</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] w-full">
+          <CardContent className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyActivity} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
                 <XAxis dataKey="day" />
@@ -195,68 +227,52 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Recent Activity */}
         <Card className="rounded-3xl shadow-inlustro border-0">
-          <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
+          <CardHeader className="bg-gradient-to-r from-green-500/10 to-transparent rounded-t-3xl">
             <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Upcoming Tasks
+              <CheckCircle2 className="h-5 w-5" />
+              Recent Activity
             </CardTitle>
-            <CardDescription>Your schedule for the next few days</CardDescription>
+            <CardDescription>Your latest actions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {upcomingTasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{task.title}</p>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {task.type}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-                </div>
-                <Badge 
-                  variant={task.priority === 'High' ? 'destructive' : task.priority === 'Medium' ? 'default' : 'outline'}
-                  className="text-xs"
-                >
-                  {task.priority}
-                </Badge>
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
+                <p className="text-sm font-medium">{activity.action}</p>
+                <p className="text-xs text-muted-foreground">{activity.details}</p>
+                <p className="text-xs text-muted-foreground">{activity.time}</p>
               </div>
             ))}
-            <Button variant="ghost" className="w-full mt-2 text-inlustro-purple hover:text-inlustro-purple/80 hover:bg-inlustro-purple/10">
-              View All Tasks
-            </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity */}
+      {/* Classes Overview */}
       <Card className="rounded-3xl shadow-inlustro border-0">
         <CardHeader className="bg-gradient-to-r from-inlustro-purple/10 to-transparent rounded-t-3xl">
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5" />
-            Recent Activity
-          </CardTitle>
-          <CardDescription>Your recent teaching activities</CardDescription>
+          <CardTitle>My Classes & Subjects</CardTitle>
+          <CardDescription>Overview of your teaching assignments</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-            <p className="text-sm font-medium">Completed lesson: Quadratic Equations</p>
-            <p className="text-xs text-muted-foreground">2 hours ago • Class 10A</p>
-          </div>
-          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-            <p className="text-sm font-medium">Graded 15 homework submissions</p>
-            <p className="text-xs text-muted-foreground">Yesterday • Class 10B</p>
-          </div>
-          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-            <p className="text-sm font-medium">Created new assignment: Algebra Practice</p>
-            <p className="text-xs text-muted-foreground">2 days ago • Class 10C</p>
-          </div>
-          <div className="space-y-2 border-l-2 border-inlustro-purple pl-4 py-2">
-            <p className="text-sm font-medium">Uploaded lesson resources</p>
-            <p className="text-xs text-muted-foreground">3 days ago • Quadratic Functions</p>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {currentUser.classes.map((className, index) => (
+              <Link key={className} to="/my-classes" className="block">
+                <Card className="hover:shadow-lg transition-all border-2 hover:border-inlustro-purple/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold">{className}</h3>
+                      <Badge variant="outline">{currentUser.subject}</Badge>
+                    </div>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p>Students: {Math.floor(Math.random() * 10) + 25}</p>
+                      <p>Lessons: {Math.floor(Math.random() * 5) + 8} completed</p>
+                      <p>Avg Performance: {Math.floor(Math.random() * 20) + 75}%</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
         </CardContent>
       </Card>
