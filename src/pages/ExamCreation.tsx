@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Upload, FileText, Download, Settings, Plus, Share2 } from 'lucide-react';
+import { Upload, FileText, Download, Settings, Plus, Share2, Edit } from 'lucide-react';
 import ExamPreview from '@/components/ExamPreview';
 import ManualQuestionForm from '@/components/ManualQuestionForm';
 
@@ -18,6 +18,7 @@ interface Question {
   marks: number;
   type: 'mcq' | 'short' | 'long';
   explanation?: string;
+  source?: 'ai' | 'manual';
 }
 
 interface ExamData {
@@ -54,19 +55,25 @@ const ExamCreation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recentExams, setRecentExams] = useState<ExamData[]>([]);
+  const [classes, setClasses] = useState<string[]>([]);
 
-  const classes = ['10A', '10B', '10C', '9A', '9B', '8A', '8B'];
-
-  // TODO: Connect to backend API
+  // TODO: Connect to backend - fetch classes and recent exams
   useEffect(() => {
-    // Fetch recent exams from backend
-    const fetchRecentExams = async () => {
+    const fetchInitialData = async () => {
       try {
-        // const response = await fetch('/api/exams/recent');
-        // const data = await response.json();
-        // setRecentExams(data);
+        setLoading(true);
+        
+        // TODO: Replace with actual API calls
+        // const classesResponse = await fetch('/api/classes');
+        // const classesData = await classesResponse.json();
+        // setClasses(classesData);
+        
+        // const recentExamsResponse = await fetch('/api/exams/recent');
+        // const recentExamsData = await recentExamsResponse.json();
+        // setRecentExams(recentExamsData);
         
         // Mock data for now
+        setClasses(['10A', '10B', '10C', '9A', '9B', '8A', '8B']);
         setRecentExams([
           {
             title: 'Mid-term Mathematics Exam',
@@ -84,11 +91,14 @@ const ExamCreation = () => {
           }
         ]);
       } catch (err) {
-        console.error('Error fetching recent exams:', err);
+        console.error('Error fetching initial data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchRecentExams();
+    fetchInitialData();
   }, []);
 
   const calculateTotalMarks = () => {
@@ -122,10 +132,11 @@ const ExamCreation = () => {
       const marks = parseInt(markType.split('-')[0]);
       for (let i = 0; i < count; i++) {
         questions.push({
-          id: `q${questionId++}`,
-          text: `Sample ${marks}-mark question ${i + 1}. This is a generated question based on the uploaded content.`,
+          id: `ai-q${questionId++}`,
+          text: `AI Generated ${marks}-mark question ${i + 1}. This question is based on the uploaded content and covers key concepts from the syllabus.`,
           marks,
           type: marks <= 2 ? 'short' : marks <= 5 ? 'short' : 'long',
+          source: 'ai'
         });
       }
     });
@@ -181,7 +192,7 @@ const ExamCreation = () => {
 
       toast({
         title: "Exam generated successfully",
-        description: "Review your exam and make any necessary changes."
+        description: "Review your exam and add manual questions if needed."
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate exam');
@@ -200,7 +211,8 @@ const ExamCreation = () => {
 
     const newQuestion: Question = {
       ...question,
-      id: `manual-${Date.now()}`
+      id: `manual-${Date.now()}`,
+      source: 'manual'
     };
 
     const updatedExam = {
@@ -222,6 +234,8 @@ const ExamCreation = () => {
     if (!generatedExam) return;
 
     try {
+      setLoading(true);
+      
       // TODO: Connect to backend API
       // const response = await fetch('/api/exams/download', {
       //   method: 'POST',
@@ -237,6 +251,9 @@ const ExamCreation = () => {
       // a.download = `${generatedExam.title}.pdf`;
       // a.click();
 
+      // Mock download delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       toast({
         title: "Download started",
         description: "Your exam PDF is being prepared for download."
@@ -247,6 +264,8 @@ const ExamCreation = () => {
         description: "Failed to download PDF. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -254,6 +273,8 @@ const ExamCreation = () => {
     if (!generatedExam) return;
 
     try {
+      setLoading(true);
+      
       // TODO: Connect to backend API
       // const response = await fetch('/api/exams/share', {
       //   method: 'POST',
@@ -266,6 +287,9 @@ const ExamCreation = () => {
       // 
       // if (!response.ok) throw new Error('Failed to share exam');
 
+      // Mock share delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       toast({
         title: "Exam shared",
         description: `Exam has been shared with class ${generatedExam.className}.`
@@ -276,6 +300,8 @@ const ExamCreation = () => {
         description: "Failed to share exam. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -283,6 +309,10 @@ const ExamCreation = () => {
     setShowPreview(false);
     setGeneratedExam(null);
     setShowManualForm(false);
+  };
+
+  const handleEditExam = () => {
+    setShowManualForm(true);
   };
 
   const PatternSelector = () => (
@@ -351,7 +381,7 @@ const ExamCreation = () => {
           totalMarks={generatedExam.totalMarks}
           onDownload={handleDownloadPDF}
           onShare={handleShareToClass}
-          onEdit={() => setShowManualForm(true)}
+          onEdit={handleEditExam}
           onBack={handleBackToCreation}
         />
       </div>
@@ -602,31 +632,35 @@ const ExamCreation = () => {
           <CardDescription>Your recently created exams</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentExams.map((exam, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">{exam.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Class {exam.className} • {exam.questions.length} questions • {exam.totalMarks} marks
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Created {index === 0 ? '2 days ago' : '1 week ago'}
-                  </p>
+          {loading ? (
+            <div className="text-center py-4">Loading recent exams...</div>
+          ) : (
+            <div className="space-y-4">
+              {recentExams.map((exam, index) => (
+                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">{exam.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Class {exam.className} • {exam.questions.length} questions • {exam.totalMarks} marks
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Created {index === 0 ? '2 days ago' : '1 week ago'}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleShareToClass}>
+                      <Share2 className="h-4 w-4 mr-1" />
+                      Share
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Share2 className="h-4 w-4 mr-1" />
-                    Share
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
