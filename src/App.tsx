@@ -14,6 +14,10 @@ import ExamCreation from "./pages/ExamCreation";
 import LiveScheduler from "./pages/LiveScheduler";
 import Messages from "./pages/Messages";
 import Lessons from "./pages/Lessons";
+import DailyLog from "./pages/DailyLog";
+import LessonPlan from "./pages/LessonPlan";
+import SyllabusSplit from "./pages/SyllabusSplit";
+import TeacherTimetable from "./pages/TeacherTimetable";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +39,10 @@ const App = () => (
             <Route path="/live-scheduler" element={<LiveScheduler />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/lessons" element={<Lessons />} />
+            <Route path="/daily-log" element={<DailyLog />} />
+            <Route path="/lesson-plan" element={<LessonPlan />} />
+            <Route path="/syllabus-split" element={<SyllabusSplit />} />
+            <Route path="/teacher-timetable" element={<TeacherTimetable />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -11,7 +10,11 @@ import {
   FileText, 
   MessageSquare,
   Calendar,
-  ChevronLeft 
+  ChevronLeft,
+  BookOpen,
+  PenTool,
+  SplitSquareHorizontal,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -37,6 +40,16 @@ const AppSidebar = () => {
       icon: <Book className="h-4 w-4" />,
     },
     {
+      path: '/lesson-plan',
+      label: 'Lesson Plan',
+      icon: <BookOpen className="h-4 w-4" />,
+    },
+    {
+      path: '/syllabus-split',
+      label: 'Syllabus Split',
+      icon: <SplitSquareHorizontal className="h-4 w-4" />,
+    },
+    {
       path: '/submissions',
       label: 'Submissions',
       icon: <ClipboardEdit className="h-4 w-4" />,
@@ -55,6 +68,16 @@ const AppSidebar = () => {
       path: '/live-scheduler',
       label: 'Live Class Scheduler',
       icon: <Calendar className="h-4 w-4" />,
+    },
+    {
+      path: '/teacher-timetable',
+      label: 'Teacher Timetable',
+      icon: <Clock className="h-4 w-4" />,
+    },
+    {
+      path: '/daily-log',
+      label: 'Daily Log',
+      icon: <PenTool className="h-4 w-4" />,
     },
     {
       path: '/messages',
