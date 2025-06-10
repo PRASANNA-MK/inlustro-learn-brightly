@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Plus, Edit, Save, Calendar } from 'lucide-react';
+import { BookOpen, Plus, Edit, Save, Calendar, Target, Play, Users, BarChart3, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface LessonPlan {
@@ -17,11 +17,12 @@ interface LessonPlan {
   className: string;
   date: string;
   duration: string;
-  objectives: string;
+  // AAA Framework fields
+  aim: string;           // Learning goal for the class
+  action: string;        // What steps will the teacher take
+  activity: string;      // What will students do
+  analysis: string;      // How will outcome be reviewed/evaluated
   materials: string;
-  activities: string;
-  assessment: string;
-  homework: string;
   notes: string;
   createdAt: string;
 }
@@ -40,11 +41,11 @@ const LessonPlan = () => {
     className: '',
     date: '',
     duration: '',
-    objectives: '',
+    aim: '',
+    action: '',
+    activity: '',
+    analysis: '',
     materials: '',
-    activities: '',
-    assessment: '',
-    homework: '',
     notes: ''
   });
 
@@ -71,7 +72,7 @@ const LessonPlan = () => {
         // Mock API delay
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Mock data
+        // Mock data with AAA framework
         const mockPlans: LessonPlan[] = [
           {
             id: '1',
@@ -80,12 +81,12 @@ const LessonPlan = () => {
             className: '10A',
             date: '2024-06-06',
             duration: '45',
-            objectives: 'Students will understand the basics of quadratic equations and be able to identify their standard form.',
-            materials: 'Whiteboard, markers, textbook, practice worksheets',
-            activities: '1. Review linear equations (10 min)\n2. Introduction to quadratic form (15 min)\n3. Examples and practice (20 min)',
-            assessment: 'Quick quiz at the end, observe student participation during practice',
-            homework: 'Complete exercises 1-10 from chapter 4',
-            notes: 'Focus on visual representations using graphs',
+            aim: 'Students will understand the standard form of quadratic equations and identify their key components (a, b, c coefficients).',
+            action: 'Start with review of linear equations, introduce quadratic form through visual examples, demonstrate coefficient identification, provide guided practice with examples.',
+            activity: 'Students will work in pairs to identify coefficients in given quadratic equations, solve practice problems, and create their own quadratic equations.',
+            analysis: 'Quick formative assessment through exit tickets, observe student discussions during pair work, review homework completion rates.',
+            materials: 'Whiteboard, markers, textbook, practice worksheets, graphing calculator',
+            notes: 'Focus on visual representations using graphs to help students understand the concept better.',
             createdAt: '2024-06-05T14:30:00Z'
           }
         ];
@@ -106,10 +107,10 @@ const LessonPlan = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.subject || !formData.className || !formData.objectives) {
+    if (!formData.title || !formData.subject || !formData.className || !formData.aim) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including the learning aim.",
         variant: "destructive"
       });
       return;
@@ -159,11 +160,11 @@ const LessonPlan = () => {
         className: '',
         date: '',
         duration: '',
-        objectives: '',
+        aim: '',
+        action: '',
+        activity: '',
+        analysis: '',
         materials: '',
-        activities: '',
-        assessment: '',
-        homework: '',
         notes: ''
       });
       
@@ -193,15 +194,44 @@ const LessonPlan = () => {
       className: plan.className,
       date: plan.date,
       duration: plan.duration,
-      objectives: plan.objectives,
+      aim: plan.aim,
+      action: plan.action,
+      activity: plan.activity,
+      analysis: plan.analysis,
       materials: plan.materials,
-      activities: plan.activities,
-      assessment: plan.assessment,
-      homework: plan.homework,
       notes: plan.notes
     });
     setEditingPlan(plan.id);
     setShowForm(true);
+  };
+
+  // TODO: Connect to backend - Delete lesson plan
+  const handleDelete = async (id: string) => {
+    try {
+      setLoading(true);
+      
+      // TODO: Replace with actual API call
+      // const response = await fetch(`/api/lesson-plans/${id}`, {
+      //   method: 'DELETE'
+      // });
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setPlans(prev => prev.filter(plan => plan.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Lesson plan deleted successfully."
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to delete lesson plan.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -211,11 +241,11 @@ const LessonPlan = () => {
       className: '',
       date: '',
       duration: '',
-      objectives: '',
+      aim: '',
+      action: '',
+      activity: '',
+      analysis: '',
       materials: '',
-      activities: '',
-      assessment: '',
-      homework: '',
       notes: ''
     });
     setShowForm(false);
@@ -225,10 +255,8 @@ const LessonPlan = () => {
   if (loading && plans.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">Lesson Plan</h1>
-          <p className="text-muted-foreground">Loading lesson plans...</p>
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">Lesson Plan</h1>
+        <p className="text-muted-foreground">Loading lesson plans...</p>
       </div>
     );
   }
@@ -236,11 +264,9 @@ const LessonPlan = () => {
   if (error) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">Lesson Plan</h1>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
-          </div>
+        <h1 className="text-3xl font-bold tracking-tight">Lesson Plan</h1>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">{error}</p>
         </div>
       </div>
     );
@@ -257,7 +283,7 @@ const LessonPlan = () => {
           </Button>
         </div>
         <p className="text-muted-foreground">
-          Create and manage detailed lesson plans for your classes.
+          Create comprehensive lesson plans using the modern AAA framework: Aim, Action, Activity, Analysis.
         </p>
       </div>
 
@@ -269,7 +295,7 @@ const LessonPlan = () => {
               {editingPlan ? 'Edit Lesson Plan' : 'New Lesson Plan'}
             </CardTitle>
             <CardDescription>
-              Create a comprehensive plan for your lesson
+              Use the AAA framework to create effective lesson plans
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -287,7 +313,7 @@ const LessonPlan = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject *</Label>
+                  <Label>Subject *</Label>
                   <Select value={formData.subject} onValueChange={(value) => setFormData(prev => ({ ...prev, subject: value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select subject" />
@@ -301,7 +327,7 @@ const LessonPlan = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="className">Class *</Label>
+                  <Label>Class *</Label>
                   <Select value={formData.className} onValueChange={(value) => setFormData(prev => ({ ...prev, className: value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select class" />
@@ -315,19 +341,17 @@ const LessonPlan = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label>Date</Label>
                   <Input
-                    id="date"
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Duration (minutes)</Label>
+                <div className="md:col-span-2 space-y-2">
+                  <Label>Duration (minutes)</Label>
                   <Input
-                    id="duration"
                     type="number"
                     placeholder="45"
                     value={formData.duration}
@@ -335,23 +359,72 @@ const LessonPlan = () => {
                   />
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="objectives">Learning Objectives *</Label>
-                <Textarea
-                  id="objectives"
-                  placeholder="What will students learn or be able to do after this lesson?"
-                  value={formData.objectives}
-                  onChange={(e) => setFormData(prev => ({ ...prev, objectives: e.target.value }))}
-                  required
-                  rows={3}
-                />
+
+              {/* AAA Framework Section */}
+              <div className="space-y-6 border-t pt-6">
+                <h3 className="text-lg font-semibold">AAA Framework</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="aim" className="flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Aim - Learning Goal *
+                  </Label>
+                  <Textarea
+                    id="aim"
+                    placeholder="What is the specific learning goal for this class? What should students understand or be able to do by the end?"
+                    value={formData.aim}
+                    onChange={(e) => setFormData(prev => ({ ...prev, aim: e.target.value }))}
+                    required
+                    rows={3}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="action" className="flex items-center gap-2">
+                    <Play className="h-4 w-4" />
+                    Action - Teacher Steps
+                  </Label>
+                  <Textarea
+                    id="action"
+                    placeholder="What specific steps will you take as the teacher? Include instruction methods, demonstrations, examples, etc."
+                    value={formData.action}
+                    onChange={(e) => setFormData(prev => ({ ...prev, action: e.target.value }))}
+                    rows={4}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="activity" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Activity - Student Tasks
+                  </Label>
+                  <Textarea
+                    id="activity"
+                    placeholder="What will students actively do? Include tasks, projects, discussions, practice exercises, group work, etc."
+                    value={formData.activity}
+                    onChange={(e) => setFormData(prev => ({ ...prev, activity: e.target.value }))}
+                    rows={4}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="analysis" className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Analysis - Evaluation & Review
+                  </Label>
+                  <Textarea
+                    id="analysis"
+                    placeholder="How will you assess understanding and review outcomes? Include formative assessment, feedback methods, success indicators, etc."
+                    value={formData.analysis}
+                    onChange={(e) => setFormData(prev => ({ ...prev, analysis: e.target.value }))}
+                    rows={3}
+                  />
+                </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="materials">Materials Required</Label>
+                <Label>Materials Required</Label>
                 <Textarea
-                  id="materials"
                   placeholder="List all materials, resources, and equipment needed..."
                   value={formData.materials}
                   onChange={(e) => setFormData(prev => ({ ...prev, materials: e.target.value }))}
@@ -360,43 +433,9 @@ const LessonPlan = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="activities">Lesson Activities</Label>
+                <Label>Additional Notes</Label>
                 <Textarea
-                  id="activities"
-                  placeholder="Describe the sequence of activities and timing..."
-                  value={formData.activities}
-                  onChange={(e) => setFormData(prev => ({ ...prev, activities: e.target.value }))}
-                  rows={4}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="assessment">Assessment Methods</Label>
-                <Textarea
-                  id="assessment"
-                  placeholder="How will you assess student understanding?"
-                  value={formData.assessment}
-                  onChange={(e) => setFormData(prev => ({ ...prev, assessment: e.target.value }))}
-                  rows={2}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="homework">Homework/Follow-up</Label>
-                <Textarea
-                  id="homework"
-                  placeholder="Any homework assignments or follow-up activities..."
-                  value={formData.homework}
-                  onChange={(e) => setFormData(prev => ({ ...prev, homework: e.target.value }))}
-                  rows={2}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="notes">Additional Notes</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Any additional notes or reminders..."
+                  placeholder="Any additional notes, reminders, or special considerations..."
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                   rows={2}
@@ -420,11 +459,11 @@ const LessonPlan = () => {
       <Card>
         <CardHeader>
           <CardTitle>My Lesson Plans</CardTitle>
-          <CardDescription>Your created lesson plans</CardDescription>
+          <CardDescription>Your lesson plans using the AAA framework</CardDescription>
         </CardHeader>
         <CardContent>
           {plans.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {plans.map((plan) => (
                 <div key={plan.id} className="border rounded-lg p-6 hover:bg-slate-50 transition-colors">
                   <div className="flex items-start justify-between mb-4">
@@ -444,42 +483,73 @@ const LessonPlan = () => {
                         )}
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(plan)}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(plan)}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(plan.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                   
-                  <div className="space-y-3 text-sm">
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Objectives</h4>
-                      <p className="text-gray-600">{plan.objectives}</p>
+                  {/* AAA Framework Display */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-900 flex items-center gap-1">
+                        <Target className="h-4 w-4" />
+                        Aim
+                      </h4>
+                      <p className="text-gray-600">{plan.aim}</p>
                     </div>
                     
-                    {plan.materials && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-1">Materials</h4>
-                        <p className="text-gray-600">{plan.materials}</p>
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-900 flex items-center gap-1">
+                        <Play className="h-4 w-4" />
+                        Action
+                      </h4>
+                      <p className="text-gray-600">{plan.action}</p>
+                    </div>
                     
-                    {plan.activities && (
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-1">Activities</h4>
-                        <p className="text-gray-600 whitespace-pre-line">{plan.activities}</p>
-                      </div>
-                    )}
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-900 flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        Activity
+                      </h4>
+                      <p className="text-gray-600">{plan.activity}</p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-900 flex items-center gap-1">
+                        <BarChart3 className="h-4 w-4" />
+                        Analysis
+                      </h4>
+                      <p className="text-gray-600">{plan.analysis}</p>
+                    </div>
                   </div>
+                  
+                  {plan.materials && (
+                    <div className="mt-4 pt-4 border-t">
+                      <h4 className="font-medium text-gray-900 mb-1">Materials</h4>
+                      <p className="text-sm text-gray-600">{plan.materials}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No lesson plans found. Create your first lesson plan to get started.</p>
+              <p className="text-muted-foreground">No lesson plans found. Create your first lesson plan using the AAA framework.</p>
             </div>
           )}
         </CardContent>

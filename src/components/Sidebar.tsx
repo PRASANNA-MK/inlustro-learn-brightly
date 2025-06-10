@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -134,9 +135,6 @@ const AppSidebar = () => {
                 </NavLink>
               ))}
             </nav>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 text-xs text-white/70 text-center">
-            © {new Date().getFullYear()} Teacher Portal
           </div>
         </div>
       </div>
