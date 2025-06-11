@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import LessonPlan from "./pages/LessonPlan";
 import SyllabusSplit from "./pages/SyllabusSplit";
 import TeacherTimetable from "./pages/TeacherTimetable";
 import NotFound from "./pages/NotFound";
+import MarkSheet from "./pages/MarkSheet";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +43,7 @@ const App = () => (
             <Route path="/lesson-plan" element={<LessonPlan />} />
             <Route path="/syllabus-split" element={<SyllabusSplit />} />
             <Route path="/teacher-timetable" element={<TeacherTimetable />} />
+            <Route path="/mark-sheet" element={<MarkSheet />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

@@ -15,7 +15,8 @@ import {
   BookOpen,
   PenTool,
   SplitSquareHorizontal,
-  Clock
+  Clock,
+  GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,11 @@ const AppSidebar = () => {
       path: '/student-tracker',
       label: 'Student Tracker',
       icon: <UserCheck className="h-4 w-4" />,
+    },
+    {
+      path: '/mark-sheet',
+      label: 'Mark Sheet',
+      icon: <GraduationCap className="h-4 w-4" />,
     },
     {
       path: '/exam-creation',
