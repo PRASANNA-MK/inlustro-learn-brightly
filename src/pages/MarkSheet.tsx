@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Share2, RotateCcw, FileDown, User, BookOpen } from 'lucide-react';
+import { Download, Share2, RotateCcw, FileDown, User, BookOpen, MoreVertical } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import MarksheetTemplateSetup from '@/components/MarksheetTemplateSetup';
 import { MarksheetTemplate, StudentMarksheetData, generateMarksheetPDF, generateBulkMarksheetPDF } from '@/utils/pdfGenerator';
@@ -500,7 +501,6 @@ const MarkSheet = () => {
         </div>
       </div>
 
-      {/* Template Setup - Only visible for class in-charge */}
       {canDownloadShare() && (
         <MarksheetTemplateSetup
           template={marksheetTemplate}
@@ -541,37 +541,44 @@ const MarkSheet = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-lg border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-16">S.No</TableHead>
-                    <TableHead className="w-48">Student Name</TableHead>
-                    <TableHead className="w-24">Roll No</TableHead>
-                    <TableHead className="w-32">Class & Section</TableHead>
+                    <TableHead className="w-12 min-w-12">S.No</TableHead>
+                    <TableHead className="min-w-[180px] max-w-[220px]">Student Name</TableHead>
+                    <TableHead className="w-20 min-w-20">Roll No</TableHead>
+                    <TableHead className="w-24 min-w-24 text-center">Class</TableHead>
                     {getDisplaySubjects().map(subject => (
-                      <TableHead key={subject} className="text-center min-w-32">
-                        {subject}
-                        <div className="text-xs text-gray-500">
-                          Marks | Remarks
-                          {canEditSubject(subject) && <span className="text-green-600"> (Editable)</span>}
+                      <TableHead key={subject} className="text-center min-w-[140px] max-w-[160px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium">{subject}</span>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Marks | Grade
+                            {canEditSubject(subject) && <span className="text-green-600"> ✓</span>}
+                          </div>
                         </div>
                       </TableHead>
                     ))}
-                    {canDownloadShare() && <TableHead className="w-32">Actions</TableHead>}
+                    {canDownloadShare() && <TableHead className="w-16 min-w-16 text-center">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {students.map((student, index) => (
                     <React.Fragment key={student.id}>
                       <TableRow className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">{student.name}</TableCell>
-                        <TableCell>{student.rollNo}</TableCell>
-                        <TableCell>{student.class} - {student.section}</TableCell>
+                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="truncate pr-2">{student.name}</div>
+                        </TableCell>
+                        <TableCell className="text-center">{student.rollNo}</TableCell>
+                        <TableCell className="text-center text-sm">
+                          <div>{student.class}</div>
+                          <div className="text-xs text-gray-500">{student.section}</div>
+                        </TableCell>
                         {getDisplaySubjects().map(subject => (
-                          <TableCell key={subject} className="text-center">
-                            <div className="space-y-2">
+                          <TableCell key={subject} className="text-center p-2">
+                            <div className="flex flex-col gap-1.5">
                               <Input
                                 type="number"
                                 placeholder="0-100"
@@ -582,7 +589,7 @@ const MarkSheet = () => {
                                     updateMarkEntry(student.id, subject, 'marks', value === '' ? '' : parseInt(value));
                                   }
                                 }}
-                                className="w-20 h-8 text-center"
+                                className="w-full h-8 text-center text-sm"
                                 min="0"
                                 max="100"
                                 disabled={!canEditSubject(subject)}
@@ -592,12 +599,14 @@ const MarkSheet = () => {
                                 onValueChange={(value) => updateMarkEntry(student.id, subject, 'remarks', value)}
                                 disabled={!canEditSubject(subject)}
                               >
-                                <SelectTrigger className="w-32 h-8 text-xs">
-                                  <SelectValue placeholder="Remarks" />
+                                <SelectTrigger className="w-full h-7 text-xs">
+                                  <SelectValue placeholder="Grade" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {remarksOptions.map(remark => (
-                                    <SelectItem key={remark} value={remark}>{remark}</SelectItem>
+                                    <SelectItem key={remark} value={remark} className="text-xs">
+                                      {remark}
+                                    </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
@@ -605,25 +614,30 @@ const MarkSheet = () => {
                           </TableCell>
                         ))}
                         {canDownloadShare() && (
-                          <TableCell>
-                            <div className="flex flex-col gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => generateComment(student.id)}
-                                className="text-xs"
-                              >
-                                Generate Comment
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDownloadIndividual(student.id)}
-                                className="text-xs"
-                              >
-                                <FileDown className="h-3 w-3 mr-1" />
-                                Download
-                              </Button>
-                            </div>
+                          <TableCell className="text-center p-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem
+                                  onClick={() => generateComment(student.id)}
+                                  className="cursor-pointer"
+                                >
+                                  <FileDown className="h-4 w-4 mr-2" />
+                                  Generate Comment
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDownloadIndividual(student.id)}
+                                  className="cursor-pointer"
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download PDF
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         )}
                       </TableRow>
