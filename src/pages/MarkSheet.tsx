@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +6,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Share2, RotateCcw, FileDown, User, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import MarksheetTemplateSetup from '@/components/MarksheetTemplateSetup';
+import { MarksheetTemplate, StudentMarksheetData, generateMarksheetPDF, generateBulkMarksheetPDF } from '@/utils/pdfGenerator';
 
 interface Student {
   id: string;
@@ -72,6 +73,17 @@ const MarkSheet = () => {
   ];
 
   const remarksOptions = ['Excellent', 'Good', 'Average', 'Needs Improvement'];
+
+  // Add template state
+  const [marksheetTemplate, setMarksheetTemplate] = useState<MarksheetTemplate>({
+    schoolName: 'Delhi Public School',
+    academicYear: '2024-2025',
+    classTeacherName: currentTeacher.name,
+    classSection: currentTeacher.class,
+    headerTitle: 'Academic Report Card',
+    gradingSystem: 'A: 90-100, B: 80-89, C: 70-79, D: 60-69, F: Below 60',
+    footerNotes: 'This is to certify that the above marks are correct.\n\nPrincipal Signature: ________________'
+  });
 
   // Determine teacher type for conditional rendering
   const getTeacherType = () => {
@@ -241,6 +253,7 @@ const MarkSheet = () => {
     return comment ? comment.comment : '';
   };
 
+  // Updated download functions with PDF generation
   const handleDownloadAll = async () => {
     if (!canDownloadShare()) {
       toast({
@@ -251,22 +264,54 @@ const MarkSheet = () => {
       return;
     }
 
+    if (!examType) {
+      toast({
+        title: "Error",
+        description: "Please select an exam type first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // TODO: Integrate with backend API
-      // const response = await fetch('/api/marksheets/download-all', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ examType, markEntries, studentComments }),
-      // });
+      // Prepare student data for PDF generation
+      const studentsData: StudentMarksheetData[] = students.map(student => {
+        const marks: { [subject: string]: number | string } = {};
+        const remarks: { [subject: string]: string } = {};
+        
+        getDisplaySubjects().forEach(subject => {
+          marks[subject] = getMarkEntry(student.id, subject, 'marks');
+          remarks[subject] = getMarkEntry(student.id, subject, 'remarks').toString();
+        });
+
+        return {
+          id: student.id,
+          name: student.name,
+          rollNo: student.rollNo,
+          class: student.class,
+          section: student.section,
+          marks,
+          remarks,
+          comment: getStudentComment(student.id)
+        };
+      });
+
+      await generateBulkMarksheetPDF(marksheetTemplate, studentsData, examType);
       
       toast({
         title: "Download Started",
-        description: "All mark sheets are being prepared for download",
+        description: `Downloading ${students.length} report cards...`,
       });
       setLoading(false);
     } catch (err) {
       setError('Failed to download mark sheets');
       setLoading(false);
+      toast({
+        title: "Error",
+        description: "Failed to generate mark sheets",
+        variant: "destructive",
+      });
     }
   };
 
@@ -280,12 +325,44 @@ const MarkSheet = () => {
       return;
     }
 
+    if (!examType) {
+      toast({
+        title: "Error",
+        description: "Please select an exam type first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      // TODO: Integrate with backend API
       const student = students.find(s => s.id === studentId);
+      if (!student) return;
+
+      // Prepare student data for PDF generation
+      const marks: { [subject: string]: number | string } = {};
+      const remarks: { [subject: string]: string } = {};
+      
+      getDisplaySubjects().forEach(subject => {
+        marks[subject] = getMarkEntry(student.id, subject, 'marks');
+        remarks[subject] = getMarkEntry(student.id, subject, 'remarks').toString();
+      });
+
+      const studentData: StudentMarksheetData = {
+        id: student.id,
+        name: student.name,
+        rollNo: student.rollNo,
+        class: student.class,
+        section: student.section,
+        marks,
+        remarks,
+        comment: getStudentComment(student.id)
+      };
+
+      await generateMarksheetPDF(marksheetTemplate, studentData, examType);
+      
       toast({
         title: "Download Started",
-        description: `Mark sheet for ${student?.name} is being prepared`,
+        description: `Mark sheet for ${student.name} is being prepared`,
       });
     } catch (err) {
       toast({
@@ -338,6 +415,12 @@ const MarkSheet = () => {
       title: "Reset Complete",
       description: "All fields have been cleared",
     });
+  };
+
+  const handleSaveTemplate = (template: MarksheetTemplate) => {
+    setMarksheetTemplate(template);
+    // TODO: Save template to backend
+    console.log('Saving template:', template);
   };
 
   if (loading) {
@@ -416,6 +499,15 @@ const MarkSheet = () => {
           </Button>
         </div>
       </div>
+
+      {/* Template Setup - Only visible for class in-charge */}
+      {canDownloadShare() && (
+        <MarksheetTemplateSetup
+          template={marksheetTemplate}
+          onSaveTemplate={handleSaveTemplate}
+          currentTeacher={currentTeacher}
+        />
+      )}
 
       <Card>
         <CardHeader>
