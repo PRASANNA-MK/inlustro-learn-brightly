@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Share2, RotateCcw, FileDown } from 'lucide-react';
+import { Download, Share2, RotateCcw, FileDown, User, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Student {
@@ -28,10 +28,25 @@ interface StudentComment {
   comment: string;
 }
 
+interface TeacherData {
+  name: string;
+  subject: string;
+  class: string;
+  isInCharge: boolean;
+}
+
 const MarkSheet = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Teacher role simulation - can be changed to test different scenarios
+  const [currentTeacher, setCurrentTeacher] = useState<TeacherData>({
+    name: "Teacher A",
+    subject: "Mathematics",
+    class: "10A",
+    isInCharge: true
+  });
   
   // State for exam type and data
   const [examType, setExamType] = useState<string>('');
@@ -49,7 +64,49 @@ const MarkSheet = () => {
     { id: '5', name: 'Arjun Singh', rollNo: '005', class: '10th', section: 'A' },
   ];
 
+  // Mock teacher data for testing different scenarios
+  const mockTeacherTypes = [
+    { name: "Teacher A", subject: "Mathematics", class: "10A", isInCharge: true },
+    { name: "Teacher B", subject: "Science", class: "10A", isInCharge: false },
+    { name: "Teacher C", subject: "", class: "10A", isInCharge: true }
+  ];
+
   const remarksOptions = ['Excellent', 'Good', 'Average', 'Needs Improvement'];
+
+  // Determine teacher type for conditional rendering
+  const getTeacherType = () => {
+    if (currentTeacher.isInCharge && currentTeacher.subject) {
+      return 'incharge-and-subject'; // Can see all, edit own subject
+    } else if (!currentTeacher.isInCharge && currentTeacher.subject) {
+      return 'subject-only'; // Can see/edit only own subject
+    } else if (currentTeacher.isInCharge && !currentTeacher.subject) {
+      return 'incharge-only'; // Can see all, edit none
+    }
+    return 'none';
+  };
+
+  const teacherType = getTeacherType();
+
+  // Get subjects to display based on teacher role
+  const getDisplaySubjects = () => {
+    if (teacherType === 'subject-only') {
+      return [currentTeacher.subject];
+    }
+    return subjects;
+  };
+
+  // Check if teacher can edit a specific subject
+  const canEditSubject = (subject: string) => {
+    if (teacherType === 'incharge-only') return false;
+    if (teacherType === 'subject-only') return subject === currentTeacher.subject;
+    if (teacherType === 'incharge-and-subject') return subject === currentTeacher.subject;
+    return false;
+  };
+
+  // Check if teacher can access download/share features
+  const canDownloadShare = () => {
+    return currentTeacher.isInCharge;
+  };
 
   // Fetch students data on component mount
   useEffect(() => {
@@ -60,10 +117,9 @@ const MarkSheet = () => {
     setLoading(true);
     try {
       // TODO: Replace with actual API call
-      // const response = await fetch('/api/students');
+      // const response = await fetch(`/api/classes/${currentTeacher.class}/students`);
       // const data = await response.json();
       
-      // Mock API simulation
       setTimeout(() => {
         setStudents(mockStudents);
         initializeMarkEntries(mockStudents);
@@ -78,12 +134,12 @@ const MarkSheet = () => {
   const initializeMarkEntries = (studentList: Student[]) => {
     const entries: MarkEntry[] = [];
     studentList.forEach(student => {
-      subjects.forEach(subject => {
+      getDisplaySubjects().forEach(subject => {
         entries.push({
           studentId: student.id,
           subject,
-          marks: '',
-          remarks: ''
+          marks: Math.floor(Math.random() * 40) + 60, // Mock marks between 60-100
+          remarks: remarksOptions[Math.floor(Math.random() * remarksOptions.length)]
         });
       });
     });
@@ -91,6 +147,15 @@ const MarkSheet = () => {
   };
 
   const updateMarkEntry = (studentId: string, subject: string, field: 'marks' | 'remarks', value: string | number) => {
+    if (!canEditSubject(subject)) {
+      toast({
+        title: "Access Denied",
+        description: "You can only edit marks for your subject",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setMarkEntries(prev => prev.map(entry => 
       entry.studentId === studentId && entry.subject === subject
         ? { ...entry, [field]: value }
@@ -109,6 +174,15 @@ const MarkSheet = () => {
   };
 
   const generateComment = (studentId: string) => {
+    if (!canDownloadShare()) {
+      toast({
+        title: "Access Denied",
+        description: "Only class in-charge can generate comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const student = students.find(s => s.id === studentId);
     if (!student) return;
 
@@ -168,6 +242,15 @@ const MarkSheet = () => {
   };
 
   const handleDownloadAll = async () => {
+    if (!canDownloadShare()) {
+      toast({
+        title: "Access Denied",
+        description: "Only class in-charge can download mark sheets",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // TODO: Integrate with backend API
@@ -188,13 +271,17 @@ const MarkSheet = () => {
   };
 
   const handleDownloadIndividual = async (studentId: string) => {
+    if (!canDownloadShare()) {
+      toast({
+        title: "Access Denied",
+        description: "Only class in-charge can download mark sheets",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       // TODO: Integrate with backend API
-      // const response = await fetch(`/api/marksheets/download/${studentId}`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({ examType, markEntries, studentComments }),
-      // });
-      
       const student = students.find(s => s.id === studentId);
       toast({
         title: "Download Started",
@@ -210,13 +297,17 @@ const MarkSheet = () => {
   };
 
   const handleShareAll = async () => {
+    if (!canDownloadShare()) {
+      toast({
+        title: "Access Denied",
+        description: "Only class in-charge can share mark sheets",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       // TODO: Integrate with backend API
-      // const response = await fetch('/api/marksheets/share-all', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ examType, markEntries, studentComments }),
-      // });
-      
       toast({
         title: "Shared Successfully",
         description: "All mark sheets have been shared to student dashboards",
@@ -231,6 +322,15 @@ const MarkSheet = () => {
   };
 
   const handleResetAll = () => {
+    if (teacherType === 'incharge-only') {
+      toast({
+        title: "Access Denied",
+        description: "You cannot edit or reset mark entries",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setMarkEntries(prev => prev.map(entry => ({ ...entry, marks: '', remarks: '' })));
     setStudentComments([]);
     setExamType('');
@@ -238,12 +338,6 @@ const MarkSheet = () => {
       title: "Reset Complete",
       description: "All fields have been cleared",
     });
-  };
-
-  const isFormComplete = () => {
-    return examType && markEntries.every(entry => 
-      entry.marks !== '' && entry.remarks !== '' && validateMarks(entry.marks.toString())
-    );
   };
 
   if (loading) {
@@ -265,16 +359,57 @@ const MarkSheet = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Mark Sheet Management</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Mark Sheet Management</h1>
+          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>{currentTeacher.name}</span>
+            </div>
+            {currentTeacher.subject && (
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                <span>{currentTeacher.subject}</span>
+              </div>
+            )}
+            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+              {teacherType === 'incharge-and-subject' ? 'Class In-charge & Subject Teacher' :
+               teacherType === 'subject-only' ? 'Subject Teacher' :
+               teacherType === 'incharge-only' ? 'Class In-charge' : 'Teacher'}
+            </span>
+          </div>
+        </div>
         <div className="flex gap-2">
-          <Button onClick={handleDownloadAll} variant="outline" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Download All
-          </Button>
-          <Button onClick={handleShareAll} variant="outline" className="flex items-center gap-2">
-            <Share2 className="h-4 w-4" />
-            Share All
-          </Button>
+          {/* Demo: Teacher Type Switcher */}
+          <Select 
+            value={`${currentTeacher.name}`} 
+            onValueChange={(value) => {
+              const teacher = mockTeacherTypes.find(t => t.name === value);
+              if (teacher) setCurrentTeacher(teacher);
+            }}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Switch Teacher" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Teacher A">Teacher A (In-charge + Math)</SelectItem>
+              <SelectItem value="Teacher B">Teacher B (Science only)</SelectItem>
+              <SelectItem value="Teacher C">Teacher C (In-charge only)</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {canDownloadShare() && (
+            <>
+              <Button onClick={handleDownloadAll} variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Download All
+              </Button>
+              <Button onClick={handleShareAll} variant="outline" className="flex items-center gap-2">
+                <Share2 className="h-4 w-4" />
+                Share All
+              </Button>
+            </>
+          )}
           <Button onClick={handleResetAll} variant="outline" className="flex items-center gap-2">
             <RotateCcw className="h-4 w-4" />
             Reset All
@@ -304,7 +439,14 @@ const MarkSheet = () => {
       {examType && (
         <Card>
           <CardHeader>
-            <CardTitle>Student Mark Sheet - {examType.replace('-', ' ').toUpperCase()}</CardTitle>
+            <CardTitle>
+              Student Mark Sheet - {examType.replace('-', ' ').toUpperCase()}
+              {teacherType === 'subject-only' && (
+                <span className="text-sm font-normal text-gray-600 ml-2">
+                  (Showing {currentTeacher.subject} only)
+                </span>
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -315,13 +457,16 @@ const MarkSheet = () => {
                     <TableHead className="w-48">Student Name</TableHead>
                     <TableHead className="w-24">Roll No</TableHead>
                     <TableHead className="w-32">Class & Section</TableHead>
-                    {subjects.map(subject => (
+                    {getDisplaySubjects().map(subject => (
                       <TableHead key={subject} className="text-center min-w-32">
                         {subject}
-                        <div className="text-xs text-gray-500">Marks | Remarks</div>
+                        <div className="text-xs text-gray-500">
+                          Marks | Remarks
+                          {canEditSubject(subject) && <span className="text-green-600"> (Editable)</span>}
+                        </div>
                       </TableHead>
                     ))}
-                    <TableHead className="w-32">Actions</TableHead>
+                    {canDownloadShare() && <TableHead className="w-32">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -332,7 +477,7 @@ const MarkSheet = () => {
                         <TableCell className="font-medium">{student.name}</TableCell>
                         <TableCell>{student.rollNo}</TableCell>
                         <TableCell>{student.class} - {student.section}</TableCell>
-                        {subjects.map(subject => (
+                        {getDisplaySubjects().map(subject => (
                           <TableCell key={subject} className="text-center">
                             <div className="space-y-2">
                               <Input
@@ -348,10 +493,12 @@ const MarkSheet = () => {
                                 className="w-20 h-8 text-center"
                                 min="0"
                                 max="100"
+                                disabled={!canEditSubject(subject)}
                               />
                               <Select 
                                 value={getMarkEntry(student.id, subject, 'remarks').toString()} 
                                 onValueChange={(value) => updateMarkEntry(student.id, subject, 'remarks', value)}
+                                disabled={!canEditSubject(subject)}
                               >
                                 <SelectTrigger className="w-32 h-8 text-xs">
                                   <SelectValue placeholder="Remarks" />
@@ -365,30 +512,32 @@ const MarkSheet = () => {
                             </div>
                           </TableCell>
                         ))}
-                        <TableCell>
-                          <div className="flex flex-col gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => generateComment(student.id)}
-                              className="text-xs"
-                            >
-                              Generate Comment
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDownloadIndividual(student.id)}
-                              className="text-xs"
-                            >
-                              <FileDown className="h-3 w-3 mr-1" />
-                              Download
-                            </Button>
-                          </div>
-                        </TableCell>
+                        {canDownloadShare() && (
+                          <TableCell>
+                            <div className="flex flex-col gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => generateComment(student.id)}
+                                className="text-xs"
+                              >
+                                Generate Comment
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadIndividual(student.id)}
+                                className="text-xs"
+                              >
+                                <FileDown className="h-3 w-3 mr-1" />
+                                Download
+                              </Button>
+                            </div>
+                          </TableCell>
+                        )}
                       </TableRow>
-                      {getStudentComment(student.id) && (
+                      {getStudentComment(student.id) && canDownloadShare() && (
                         <TableRow className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                          <TableCell colSpan={subjects.length + 5} className="text-sm italic text-gray-700 bg-blue-50 p-4">
+                          <TableCell colSpan={getDisplaySubjects().length + 5} className="text-sm italic text-gray-700 bg-blue-50 p-4">
                             <strong>Comment:</strong> {getStudentComment(student.id)}
                           </TableCell>
                         </TableRow>
@@ -399,10 +548,20 @@ const MarkSheet = () => {
               </Table>
             </div>
 
-            {!isFormComplete() && (
-              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                <p className="text-sm text-yellow-800">
-                  <strong>Note:</strong> Please ensure all marks are between 0-100 and all remarks are selected before downloading or sharing.
+            {teacherType === 'subject-only' && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> As a subject teacher, you can only view and edit marks for {currentTeacher.subject}. 
+                  Contact the class in-charge for download and sharing options.
+                </p>
+              </div>
+            )}
+
+            {teacherType === 'incharge-only' && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                <p className="text-sm text-green-800">
+                  <strong>Note:</strong> As class in-charge, you can view all marks and download/share mark sheets, 
+                  but cannot edit marks. Contact subject teachers for mark entry.
                 </p>
               </div>
             )}
