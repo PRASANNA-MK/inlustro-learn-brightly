@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -545,40 +546,40 @@ const MarkSheet = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-12 min-w-12">S.No</TableHead>
-                    <TableHead className="min-w-[180px] max-w-[220px]">Student Name</TableHead>
-                    <TableHead className="w-20 min-w-20">Roll No</TableHead>
-                    <TableHead className="w-24 min-w-24 text-center">Class</TableHead>
+                    <TableHead className="w-10">S.No</TableHead>
+                    <TableHead className="min-w-[140px]">Student Name</TableHead>
+                    <TableHead className="w-16">Roll</TableHead>
+                    <TableHead className="w-16 text-center">Class</TableHead>
                     {getDisplaySubjects().map(subject => (
-                      <TableHead key={subject} className="text-center min-w-[140px] max-w-[160px]">
+                      <TableHead key={subject} className="text-center min-w-[120px]">
                         <div className="flex flex-col">
-                          <span className="font-medium">{subject}</span>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <span className="font-medium text-xs">{subject}</span>
+                          <div className="text-xs text-gray-500 mt-0.5">
                             Marks | Grade
                             {canEditSubject(subject) && <span className="text-green-600"> ✓</span>}
                           </div>
                         </div>
                       </TableHead>
                     ))}
-                    {canDownloadShare() && <TableHead className="w-16 min-w-16 text-center">Actions</TableHead>}
+                    {canDownloadShare() && <TableHead className="w-12 text-center">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {students.map((student, index) => (
                     <React.Fragment key={student.id}>
                       <TableRow className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-medium">
-                          <div className="truncate pr-2">{student.name}</div>
+                        <TableCell className="text-center font-medium text-sm p-2">{index + 1}</TableCell>
+                        <TableCell className="font-medium p-2">
+                          <div className="truncate text-sm">{student.name}</div>
                         </TableCell>
-                        <TableCell className="text-center">{student.rollNo}</TableCell>
-                        <TableCell className="text-center text-sm">
+                        <TableCell className="text-center text-sm p-2">{student.rollNo}</TableCell>
+                        <TableCell className="text-center text-xs p-2">
                           <div>{student.class}</div>
                           <div className="text-xs text-gray-500">{student.section}</div>
                         </TableCell>
                         {getDisplaySubjects().map(subject => (
-                          <TableCell key={subject} className="text-center p-2">
-                            <div className="flex flex-col gap-1.5">
+                          <TableCell key={subject} className="text-center p-1">
+                            <div className="flex flex-col gap-1">
                               <Input
                                 type="number"
                                 placeholder="0-100"
@@ -589,7 +590,7 @@ const MarkSheet = () => {
                                     updateMarkEntry(student.id, subject, 'marks', value === '' ? '' : parseInt(value));
                                   }
                                 }}
-                                className="w-full h-8 text-center text-sm"
+                                className="w-full h-7 text-center text-xs"
                                 min="0"
                                 max="100"
                                 disabled={!canEditSubject(subject)}
@@ -599,7 +600,7 @@ const MarkSheet = () => {
                                 onValueChange={(value) => updateMarkEntry(student.id, subject, 'remarks', value)}
                                 disabled={!canEditSubject(subject)}
                               >
-                                <SelectTrigger className="w-full h-7 text-xs">
+                                <SelectTrigger className="w-full h-6 text-xs">
                                   <SelectValue placeholder="Grade" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -614,26 +615,26 @@ const MarkSheet = () => {
                           </TableCell>
                         ))}
                         {canDownloadShare() && (
-                          <TableCell className="text-center p-2">
+                          <TableCell className="text-center p-1">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                  <MoreVertical className="h-4 w-4" />
+                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                  <MoreVertical className="h-3 w-3" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuContent align="end" className="w-40">
                                 <DropdownMenuItem
                                   onClick={() => generateComment(student.id)}
-                                  className="cursor-pointer"
+                                  className="cursor-pointer text-xs"
                                 >
-                                  <FileDown className="h-4 w-4 mr-2" />
+                                  <FileDown className="h-3 w-3 mr-2" />
                                   Generate Comment
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleDownloadIndividual(student.id)}
-                                  className="cursor-pointer"
+                                  className="cursor-pointer text-xs"
                                 >
-                                  <Download className="h-4 w-4 mr-2" />
+                                  <Download className="h-3 w-3 mr-2" />
                                   Download PDF
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
